@@ -1,0 +1,51 @@
+[
+  {
+    "name": "values must be null",
+    "registry": [],
+    "schema": {
+      "values": {
+        "type": "null"
+      }
+    },
+    "instances": [
+      {
+        "instance": null,
+        "errors": [
+          {
+            "instancePath": "",
+            "schemaPath": "/values",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {},
+        "errors": []
+      },
+      {
+        "instance": {
+          "foo": null
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "foo": "foo",
+          "bar": "bar"
+        },
+        "errors": [
+          {
+            "instancePath": "/foo",
+            "schemaPath": "/values/type",
+            "schemaURI": ""
+          },
+          {
+            "instancePath": "/bar",
+            "schemaPath": "/values/type",
+            "schemaURI": ""
+          }
+        ]
+      }
+    ]
+  }
+]

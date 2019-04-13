@@ -1,0 +1,153 @@
+[
+  {
+    "name": "discriminator on variant mapping to array of nulls or booleans",
+    "registry": [],
+    "schema": {
+      "discriminator": {
+        "propertyName": "arrayOf",
+        "mapping": {
+          "nulls": {
+            "properties": {
+              "values": {
+                "elements": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          "booleans": {
+            "properties": {
+              "values": {
+                "elements": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "instances": [
+      {
+        "instance": null,
+        "errors": [
+          {
+            "instancePath": "",
+            "schemaPath": "/discriminator",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {},
+        "errors": [
+          {
+            "instancePath": "",
+            "schemaPath": "/discriminator/propertyName",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "arrayOf": null
+        },
+        "errors": [
+          {
+            "instancePath": "/arrayOf",
+            "schemaPath": "/discriminator/propertyName",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "arrayOf": "other"
+        },
+        "errors": [
+          {
+            "instancePath": "/arrayOf",
+            "schemaPath": "/discriminator/mapping",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "arrayOf": "nulls",
+          "values": [
+            null,
+            null,
+            null
+          ]
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "arrayOf": "nulls",
+          "values": [
+            true,
+            true,
+            true
+          ]
+        },
+        "errors": [
+          {
+            "instancePath": "/values/0",
+            "schemaPath": "/discriminator/mapping/nulls/properties/values/elements/type",
+            "schemaURI": ""
+          },
+          {
+            "instancePath": "/values/1",
+            "schemaPath": "/discriminator/mapping/nulls/properties/values/elements/type",
+            "schemaURI": ""
+          },
+          {
+            "instancePath": "/values/2",
+            "schemaPath": "/discriminator/mapping/nulls/properties/values/elements/type",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "arrayOf": "booleans",
+          "values": [
+            true,
+            true,
+            true
+          ]
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "arrayOf": "booleans",
+          "values": [
+            null,
+            null,
+            null
+          ]
+        },
+        "errors": [
+          {
+            "instancePath": "/values/0",
+            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type",
+            "schemaURI": ""
+          },
+          {
+            "instancePath": "/values/1",
+            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type",
+            "schemaURI": ""
+          },
+          {
+            "instancePath": "/values/2",
+            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type",
+            "schemaURI": ""
+          }
+        ]
+      }
+    ]
+  }
+]

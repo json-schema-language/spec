@@ -1,0 +1,93 @@
+[
+  {
+    "name": "properties foo of type null bar of type boolean",
+    "registry": [],
+    "schema": {
+      "properties": {
+        "foo": {
+          "type": "null"
+        },
+        "bar": {
+          "type": "boolean"
+        }
+      }
+    },
+    "instances": [
+      {
+        "instance": null,
+        "errors": [
+          {
+            "instancePath": "",
+            "schemaPath": "/properties",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {},
+        "errors": [
+          {
+            "instancePath": "",
+            "schemaPath": "/properties/foo",
+            "schemaURI": ""
+          },
+          {
+            "instancePath": "",
+            "schemaPath": "/properties/bar",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "foo": null
+        },
+        "errors": [
+          {
+            "instancePath": "",
+            "schemaPath": "/properties/bar",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "foo": null,
+          "bar": true
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "foo": "foo",
+          "bar": true
+        },
+        "errors": [
+          {
+            "instancePath": "/foo",
+            "schemaPath": "/properties/foo/type",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "foo": "foo",
+          "bar": "bar"
+        },
+        "errors": [
+          {
+            "instancePath": "/bar",
+            "schemaPath": "/properties/bar/type",
+            "schemaURI": ""
+          },
+          {
+            "instancePath": "/foo",
+            "schemaPath": "/properties/foo/type",
+            "schemaURI": ""
+          }
+        ]
+      }
+    ]
+  }
+]
