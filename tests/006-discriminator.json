@@ -4,7 +4,7 @@
     "registry": [],
     "schema": {
       "discriminator": {
-        "propertyName": "arrayOf",
+        "tag": "arrayOf",
         "mapping": {
           "nulls": {
             "properties": {
@@ -43,7 +43,7 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/discriminator/propertyName",
+            "schemaPath": "/discriminator/tag",
             "schemaURI": ""
           }
         ]
@@ -55,7 +55,7 @@
         "errors": [
           {
             "instancePath": "/arrayOf",
-            "schemaPath": "/discriminator/propertyName",
+            "schemaPath": "/discriminator/tag",
             "schemaURI": ""
           }
         ]
@@ -75,22 +75,14 @@
       {
         "instance": {
           "arrayOf": "nulls",
-          "values": [
-            null,
-            null,
-            null
-          ]
+          "values": [null, null, null]
         },
         "errors": []
       },
       {
         "instance": {
           "arrayOf": "nulls",
-          "values": [
-            true,
-            true,
-            true
-          ]
+          "values": [true, true, true]
         },
         "errors": [
           {
@@ -113,22 +105,14 @@
       {
         "instance": {
           "arrayOf": "booleans",
-          "values": [
-            true,
-            true,
-            true
-          ]
+          "values": [true, true, true]
         },
         "errors": []
       },
       {
         "instance": {
           "arrayOf": "booleans",
-          "values": [
-            null,
-            null,
-            null
-          ]
+          "values": [null, null, null]
         },
         "errors": [
           {
