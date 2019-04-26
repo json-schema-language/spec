@@ -7,6 +7,7 @@
         "type": "null"
       }
     },
+    "strictInstance": true,
     "instances": [
       {
         "instance": null,

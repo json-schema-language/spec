@@ -1,6 +1,6 @@
 [
   {
-    "name": "discriminator on variant mapping to array of nulls or booleans",
+    "name": "strict discriminator",
     "registry": [],
     "schema": {
       "discriminator": {
@@ -27,6 +27,7 @@
         }
       }
     },
+    "strictInstance": true,
     "instances": [
       {
         "instance": null,
@@ -104,6 +105,19 @@
       },
       {
         "instance": {
+          "arrayOf": "nulls",
+          "values": [null, null, null],
+          "extra": null
+        },
+        "errors": [
+          {
+            "instancePath": "/extra",
+            "schemaPath": "/discriminator/mapping/nulls/properties"
+          }
+        ]
+      },
+      {
+        "instance": {
           "arrayOf": "booleans",
           "values": [true, true, true]
         },
@@ -131,6 +145,171 @@
             "schemaURI": ""
           }
         ]
+      },
+      {
+        "instance": {
+          "arrayOf": "booleans",
+          "values": [true, true, true],
+          "extra": true
+        },
+        "errors": [
+          {
+            "instancePath": "/extra",
+            "schemaPath": "/discriminator/mapping/booleans/properties"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "non-strict discriminator",
+    "registry": [],
+    "schema": {
+      "discriminator": {
+        "tag": "arrayOf",
+        "mapping": {
+          "nulls": {
+            "properties": {
+              "values": {
+                "elements": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          "booleans": {
+            "properties": {
+              "values": {
+                "elements": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "strictInstance": false,
+    "instances": [
+      {
+        "instance": null,
+        "errors": [
+          {
+            "instancePath": "",
+            "schemaPath": "/discriminator",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {},
+        "errors": [
+          {
+            "instancePath": "",
+            "schemaPath": "/discriminator/tag",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "arrayOf": null
+        },
+        "errors": [
+          {
+            "instancePath": "/arrayOf",
+            "schemaPath": "/discriminator/tag",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "arrayOf": "other"
+        },
+        "errors": [
+          {
+            "instancePath": "/arrayOf",
+            "schemaPath": "/discriminator/mapping",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "arrayOf": "nulls",
+          "values": [null, null, null]
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "arrayOf": "nulls",
+          "values": [null, null, null],
+          "extra": null
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "arrayOf": "nulls",
+          "values": [true, true, true]
+        },
+        "errors": [
+          {
+            "instancePath": "/values/0",
+            "schemaPath": "/discriminator/mapping/nulls/properties/values/elements/type",
+            "schemaURI": ""
+          },
+          {
+            "instancePath": "/values/1",
+            "schemaPath": "/discriminator/mapping/nulls/properties/values/elements/type",
+            "schemaURI": ""
+          },
+          {
+            "instancePath": "/values/2",
+            "schemaPath": "/discriminator/mapping/nulls/properties/values/elements/type",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "arrayOf": "booleans",
+          "values": [true, true, true]
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "arrayOf": "booleans",
+          "values": [null, null, null]
+        },
+        "errors": [
+          {
+            "instancePath": "/values/0",
+            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type",
+            "schemaURI": ""
+          },
+          {
+            "instancePath": "/values/1",
+            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type",
+            "schemaURI": ""
+          },
+          {
+            "instancePath": "/values/2",
+            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "arrayOf": "booleans",
+          "values": [true, true, true],
+          "extra": true
+        },
+        "errors": []
       }
     ]
   }

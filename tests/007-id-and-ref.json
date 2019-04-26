@@ -10,6 +10,7 @@
       },
       "ref": "#a"
     },
+    "strictInstance": true,
     "instances": [
       {
         "instance": null,
@@ -41,6 +42,7 @@
       },
       "ref": "#a"
     },
+    "strictInstance": true,
     "instances": [
       {
         "instance": null,
@@ -69,6 +71,7 @@
     "schema": {
       "ref": "urn:example:foo"
     },
+    "strictInstance": true,
     "instances": [
       {
         "instance": null,
@@ -101,6 +104,7 @@
     "schema": {
       "ref": "urn:example:bar"
     },
+    "strictInstance": true,
     "instances": [
       {
         "instance": null,
@@ -126,16 +130,14 @@
         "ref": "#"
       }
     },
+    "strictInstance": true,
     "instances": [
       {
         "instance": [],
         "errors": []
       },
       {
-        "instance": [
-          [],
-          "a"
-        ],
+        "instance": [[], "a"],
         "errors": [
           {
             "instancePath": "/1",
@@ -145,20 +147,7 @@
         ]
       },
       {
-        "instance": [
-          [],
-          [
-            []
-          ],
-          [
-            [
-              [],
-              [
-                "a"
-              ]
-            ]
-          ]
-        ],
+        "instance": [[], [[]], [[[], ["a"]]]],
         "errors": [
           {
             "instancePath": "/2/0/1/0",
@@ -186,16 +175,14 @@
     "schema": {
       "ref": "urn:example:bar"
     },
+    "strictInstance": true,
     "instances": [
       {
         "instance": [],
         "errors": []
       },
       {
-        "instance": [
-          [],
-          "a"
-        ],
+        "instance": [[], "a"],
         "errors": [
           {
             "instancePath": "/1",
@@ -205,20 +192,7 @@
         ]
       },
       {
-        "instance": [
-          [],
-          [
-            []
-          ],
-          [
-            [
-              [],
-              [
-                "a"
-              ]
-            ]
-          ]
-        ],
+        "instance": [[], [[]], [[[], ["a"]]]],
         "errors": [
           {
             "instancePath": "/2/0/1/0",
@@ -250,6 +224,7 @@
         }
       }
     },
+    "strictInstance": true,
     "instances": [
       {
         "instance": null,
@@ -292,6 +267,7 @@
         }
       }
     },
+    "strictInstance": true,
     "instances": [
       {
         "instance": null,

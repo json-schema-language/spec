@@ -7,6 +7,7 @@
         "type": "null"
       }
     },
+    "strictInstance": true,
     "instances": [
       {
         "instance": null,
@@ -23,19 +24,11 @@
         "errors": []
       },
       {
-        "instance": [
-          null,
-          null,
-          null
-        ],
+        "instance": [null, null, null],
         "errors": []
       },
       {
-        "instance": [
-          null,
-          3.14,
-          "foo"
-        ],
+        "instance": [null, 3.14, "foo"],
         "errors": [
           {
             "instancePath": "/1",
@@ -61,6 +54,7 @@
         }
       }
     },
+    "strictInstance": true,
     "instances": [
       {
         "instance": null,
@@ -77,30 +71,14 @@
         "errors": []
       },
       {
-        "instance": [
-          [],
-          [],
-          []
-        ],
+        "instance": [[], [], []],
         "errors": []
       },
       {
         "instance": [
-          [
-            null,
-            null,
-            null
-          ],
-          [
-            null,
-            3.14,
-            "foo"
-          ],
-          [
-            null,
-            3.14,
-            "foo"
-          ]
+          [null, null, null],
+          [null, 3.14, "foo"],
+          [null, 3.14, "foo"]
         ],
         "errors": [
           {

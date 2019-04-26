@@ -12,6 +12,7 @@
         }
       }
     },
+    "strictInstance": true,
     "instances": [
       {
         "instance": null,

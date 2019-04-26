@@ -5,6 +5,7 @@
     "schema": {
       "type": "null"
     },
+    "strictInstance": true,
     "instances": [
       {
         "instance": null,
@@ -78,6 +79,7 @@
     "schema": {
       "type": "boolean"
     },
+    "strictInstance": true,
     "instances": [
       {
         "instance": null,
@@ -151,6 +153,7 @@
     "schema": {
       "type": "number"
     },
+    "strictInstance": true,
     "instances": [
       {
         "instance": null,
@@ -208,6 +211,7 @@
     "schema": {
       "type": "string"
     },
+    "strictInstance": true,
     "instances": [
       {
         "instance": null,
