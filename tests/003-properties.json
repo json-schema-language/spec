@@ -462,7 +462,7 @@
         "errors": [
           {
             "instancePath": "/bar",
-            "schemaPath": "/properties/bar/type",
+            "schemaPath": "/optionalProperties/bar/type",
             "schemaURI": ""
           },
           {
@@ -553,7 +553,7 @@
         "errors": [
           {
             "instancePath": "/bar",
-            "schemaPath": "/properties/bar/type",
+            "schemaPath": "/optionalProperties/bar/type",
             "schemaURI": ""
           },
           {
