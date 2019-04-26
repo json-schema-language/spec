@@ -286,7 +286,7 @@
         },
         "errors": [
           {
-            "instancePath": "/foo",
+            "instancePath": "/baz",
             "schemaPath": "/optionalProperties",
             "schemaURI": ""
           }
