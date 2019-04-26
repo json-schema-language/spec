@@ -204,5 +204,365 @@
         ]
       }
     ]
+  },
+  {
+    "name": "strict optionalProperties",
+    "registry": [],
+    "schema": {
+      "optionalProperties": {
+        "foo": {
+          "type": "null"
+        },
+        "bar": {
+          "type": "boolean"
+        }
+      }
+    },
+    "strictInstance": true,
+    "instances": [
+      {
+        "instance": null,
+        "errors": [
+          {
+            "instancePath": "",
+            "schemaPath": "/optionalProperties",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {},
+        "errors": []
+      },
+      {
+        "instance": {
+          "foo": null
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "foo": null,
+          "bar": true
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "foo": "foo",
+          "bar": true
+        },
+        "errors": [
+          {
+            "instancePath": "/foo",
+            "schemaPath": "/optionalProperties/foo/type",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "foo": "foo",
+          "bar": "bar"
+        },
+        "errors": [
+          {
+            "instancePath": "/bar",
+            "schemaPath": "/optionalProperties/bar/type",
+            "schemaURI": ""
+          },
+          {
+            "instancePath": "/foo",
+            "schemaPath": "/optionalProperties/foo/type",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "foo": null,
+          "bar": true,
+          "baz": 123
+        },
+        "errors": [
+          {
+            "instancePath": "/foo",
+            "schemaPath": "/optionalProperties",
+            "schemaURI": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "non-strict optionalProperties",
+    "registry": [],
+    "schema": {
+      "optionalProperties": {
+        "foo": {
+          "type": "null"
+        },
+        "bar": {
+          "type": "boolean"
+        }
+      }
+    },
+    "strictInstance": false,
+    "instances": [
+      {
+        "instance": null,
+        "errors": [
+          {
+            "instancePath": "",
+            "schemaPath": "/optionalProperties",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {},
+        "errors": []
+      },
+      {
+        "instance": {
+          "foo": null
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "foo": null,
+          "bar": true
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "foo": "foo",
+          "bar": true
+        },
+        "errors": [
+          {
+            "instancePath": "/foo",
+            "schemaPath": "/optionalProperties/foo/type",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "foo": "foo",
+          "bar": "bar"
+        },
+        "errors": [
+          {
+            "instancePath": "/bar",
+            "schemaPath": "/optionalProperties/bar/type",
+            "schemaURI": ""
+          },
+          {
+            "instancePath": "/foo",
+            "schemaPath": "/optionalProperties/foo/type",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "foo": null,
+          "bar": true,
+          "baz": 123
+        },
+        "errors": []
+      }
+    ]
+  },
+  {
+    "name": "strict mixed properties and optionalProperties",
+    "registry": [],
+    "schema": {
+      "properties": {
+        "foo": {
+          "type": "null"
+        }
+      },
+      "optionalProperties": {
+        "bar": {
+          "type": "boolean"
+        }
+      }
+    },
+    "strictInstance": true,
+    "instances": [
+      {
+        "instance": null,
+        "errors": [
+          {
+            "instancePath": "",
+            "schemaPath": "/properties",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {},
+        "errors": [
+          {
+            "instancePath": "",
+            "schemaPath": "/properties/foo",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "foo": null
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "foo": null,
+          "bar": true
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "foo": null,
+          "bar": true,
+          "baz": 123
+        },
+        "errors": [
+          {
+            "instancePath": "/baz",
+            "schemaPath": "/properties",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "foo": "foo",
+          "bar": true
+        },
+        "errors": [
+          {
+            "instancePath": "/foo",
+            "schemaPath": "/properties/foo/type",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "foo": "foo",
+          "bar": "bar"
+        },
+        "errors": [
+          {
+            "instancePath": "/bar",
+            "schemaPath": "/properties/bar/type",
+            "schemaURI": ""
+          },
+          {
+            "instancePath": "/foo",
+            "schemaPath": "/properties/foo/type",
+            "schemaURI": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "non-strict mixed properties and optionalProperties",
+    "registry": [],
+    "schema": {
+      "properties": {
+        "foo": {
+          "type": "null"
+        }
+      },
+      "optionalProperties": {
+        "bar": {
+          "type": "boolean"
+        }
+      }
+    },
+    "strictInstance": false,
+    "instances": [
+      {
+        "instance": null,
+        "errors": [
+          {
+            "instancePath": "",
+            "schemaPath": "/properties",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {},
+        "errors": [
+          {
+            "instancePath": "",
+            "schemaPath": "/properties/foo",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "foo": null
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "foo": null,
+          "bar": true
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "foo": null,
+          "bar": true,
+          "baz": 123
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "foo": "foo",
+          "bar": true
+        },
+        "errors": [
+          {
+            "instancePath": "/foo",
+            "schemaPath": "/properties/foo/type",
+            "schemaURI": ""
+          }
+        ]
+      },
+      {
+        "instance": {
+          "foo": "foo",
+          "bar": "bar"
+        },
+        "errors": [
+          {
+            "instancePath": "/bar",
+            "schemaPath": "/properties/bar/type",
+            "schemaURI": ""
+          },
+          {
+            "instancePath": "/foo",
+            "schemaPath": "/properties/foo/type",
+            "schemaURI": ""
+          }
+        ]
+      }
+    ]
   }
 ]
