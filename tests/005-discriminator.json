@@ -112,7 +112,8 @@
         "errors": [
           {
             "instancePath": "/extra",
-            "schemaPath": "/discriminator/mapping/nulls/properties"
+            "schemaPath": "/discriminator/mapping/nulls/properties",
+            "schemaURI": ""
           }
         ]
       },
@@ -155,7 +156,8 @@
         "errors": [
           {
             "instancePath": "/extra",
-            "schemaPath": "/discriminator/mapping/booleans/properties"
+            "schemaPath": "/discriminator/mapping/booleans/properties",
+            "schemaURI": ""
           }
         ]
       }
