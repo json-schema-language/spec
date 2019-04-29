@@ -369,7 +369,7 @@ Then the standard errors are:
 See (#eval-type-form) for how the `type` member produces errors, as the errors
 in the example above compose upon `type` errors.
 
-### Type form {eval-type-form}
+### Type form {#eval-type-form}
 
 The "type" form is meant to describe the primitive data types of JSON.
 
