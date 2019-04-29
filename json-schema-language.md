@@ -1,5 +1,5 @@
 %%%
-Title = "JavaScript Object Notation (JSON) Schema"
+Title = "JavaScript Object Notation (JSON) Schema Language"
 area = "Internet"
 workgroup = "Internet Engineering Task Force"
 
@@ -19,22 +19,23 @@ email = "ulysse@ulysse.io"
 
 .# Abstract
 
-This document describes JavaScript Object Notation (JSON) Schema, a portable
-method for describing the format of JSON data, as well as validation errors for
-ill-formatted data.
+This document describes JavaScript Object Notation (JSON) Schema Language, a
+portable method for describing the format of JSON data.
 
 {mainmatter}
 
 # Introduction
 
-JSON Schema is a schema language for JSON data. This document specifies:
+JSON Schema Language is a schema language for JSON data. This document
+specifies:
 
-- when a JSON object is a correct JSON Schema schema
-- when a JSON document is valid with respect to a correct JSON Schema schema
-- a standardized form of errors to produce when validating a JSON value
+- When a JSON object is a correct JSON Schema Language schema
+- When a JSON document is valid with respect to a correct JSON Schema Language
+  schema
+- A standardized form of errors to produce when validating a JSON value
 
-JSON Schema is centered around the question of validating a JSON value (an
-"instance") against a JSON object (a "schema"), within the context of a
+JSON Schema Language is centered around the question of validating a JSON value
+(an "instance") against a JSON object (a "schema"), within the context of a
 collection of other schemas (an "evaluation context").
 
 # Conventions
@@ -91,20 +92,10 @@ requirements:
   corresponding value **MUST** be a JSON object. This object **MUST** have
   exactly two members:
 
-  - A member with the name `propertyName`, whose corresponding value **MUST** be
-    a JSON string.
+  - A member with the name `tag`, whose corresponding value **MUST** be a JSON
+    string.
   - A member with the name `mapping`, whose corresponding value **MUST** be a
-    JSON object. The values of this object **MUST** all be correct schemas. All
-    of these schemas **MUST** fall into the "properties" form (see (#forms)),
-    and **MUST NOT** have members in `properties` or `optionalProperties` whose
-    name has the same value as `propertyName`'s.
-
-    These restrictions on the values within `mapping` are to prevent ambiguous
-    or unsatisfiable schemas.
-
-If a schema has both `properties` and `optionalProperties` members, their values
-**MUST NOT** share any member names in common. This is to prevent ambiguous or
-unsatisfiable schemas.
+    JSON object. The values of this object **MUST** all be correct schemas.
 
 ## Forms {#forms}
 
@@ -132,14 +123,77 @@ of the following forms:
   `definitions`, and/or `discriminator`, but none of the other keywords listed
   in (#schema-keywords).
 
+## Additional restrictions to prevent ambiguity
+
+To prevent ambiguous or unsatisfiable schemas during evaluation (see
+(#evaluation)), there are two additional constraints that all JSON documents
+must satisfy to be a valid schema:
+
+1. If a schema both `properties` and `optionalProperties` members, the
+   `properties` and `optionalProperties` values **MUST NOT** share any member
+   names in common.
+
+   Without this restriction, it could be ambiguous whether a property is
+   required or not.
+
+2. If a schema has a `discriminator` member, all of the values of `mapping`
+   within `discriminator` **MUST** be of the "properties" form described in
+   (#forms). Furthermore, these schemas within `mapping` **MUST NOT** have a
+   member in `properties` or `optionalProperties` whose name equals that of
+   `tag`'s within `discriminator`.
+
+   Without this restriction, it could be possible for a schema to require that
+   an instance be simultaneously an object and not an object. Additionally,
+   schemas might also give contradictory requirements by describing the same
+   instance member through both `tag` and `properties`.
+
+To illustrate the first restriction, the following JSON document is not a valid
+schema, as `foo` appears both in `properties` and `optionalProperties`:
+
+```json
+{
+  "properties": { "foo": {} },
+  "optionalProperties": { "foo": {} }
+}
+```
+
+To illsturate the second restriction, the following JSON document is not a valid
+schema because one of the members of `mapping` is not of the "properties" form:
+
+```json
+{
+  "discriminator": {
+    "tag": "foo",
+    "mapping": {
+      "a": { "elements": {} }
+    }
+  }
+}
+```
+
+Finally, the following JSON document is not a valid schema because one of
+the members of `mapping` has a `properties` member whose value equals that of
+`tag`'s:
+
+```json
+{
+  "discriminator": {
+    "tag": "foo",
+    "mapping": {
+      "a": { "properties": { "foo": { "type": "number" } } }
+    }
+  }
+}
+```
+
 ## Evaluation context and reference resolution {#ref-resolution}
 
 An evaluation context is a collection of schemas which may refer to one another.
 An evaluation context is correct if:
 
-- all of its constituent schemas are correct,
-- no two constituent schemas have the same `id` value, and
-- no more than one schema lacks an `id` value.
+- All of its constituent schemas are correct,
+- No two constituent schemas have the same `id` value, and
+- No more than one schema lacks an `id` value.
 
 If a schema is correct and it has a member named `ref`, then this member is said
 to be a reference. The reference of a correct schema **MUST** be resolvable.
@@ -155,7 +209,9 @@ Reference resolution is defined as follows:
    This URI-reference is resolved using the process described in [@!RFC3986] to
    produce a resolved URI. If the root of a schema has a member named `id`, then
    that member's corresponding value shall be used as the base URI for the URI
-   resolution process.
+   resolution process; otherwise, no base URI is used.
+
+   If the URI-reference cannot be resolved, then the reference is unresolvable.
 
 3. Take the URI from (2), and remove its fragment part, if present.
 
@@ -239,8 +295,9 @@ To facilitate consistent validation error handling, this document specifies a
 standard error format. Implementations **SHOULD** support producing errors in
 this standard form.
 
-The standard error format is a JSON array. The order of this array is not
-specified. The elements of this array are JSON objects with up to three members:
+The standard error format is a JSON array. The order of the elements of this
+array is not specified. The elements of this array are JSON objects with up to
+three members:
 
 - A member with the name `instancePath`, whose value is a JSON string containing
   a JSON Pointer. This JSON Pointer will point to the part of the instance that
@@ -354,8 +411,8 @@ Then the standard errors are:
 The "elements" form is meant to describe JSON arrays representing homogeneous
 data. When a schema is of the "elements" form, it validates:
 
-- that the instance is an array, and
-- that all of the elements of the array are of the same type
+- That the instance is an array, and
+- That all of the elements of the array are of the same type.
 
 If a schema is of the "elements" form, then:
 
@@ -410,10 +467,10 @@ The "properties" form is meant to describe JSON objects being used in a fashion
 similar to structs in C-like languages. When a schema is of the "properties"
 form, it validates:
 
-- that the instance is an object,
-- that the instance has a set of required properties, each satisfying their own
+- That the instance is an object,
+- That the instance has a set of required properties, each satisfying their own
   respective schema, and
-- that the instance may have a set of optional properties that, if present in
+- That the instance may have a set of optional properties that, if present in
   the instance, satisfy their own respective schema.
 
 If a schema is of the "properties" form, then:
@@ -509,8 +566,8 @@ The "values" form is meant to describe JSON objects being used as an associative
 array mapping arbitrary strings to values all of the same type. When a schema is
 of the "properties" form, it validates:
 
-- that the instance is an object, and
-- that the values of the instance all satisfy the same schema.
+- That the instance is an object, and
+- That the values of the instance all satisfy the same schema.
 
 If a schema is of the "values" form, then:
 
@@ -566,10 +623,10 @@ The "discriminator" form is meant to describe JSON objects being used in a
 fashion similar to a discriminated union construct in C-like languages. When a
 schema is of the "disciminator" type, it validates:
 
-- that the instance is an object,
-- that the instance has a particular "disciminator" property,
-- that this "discriminator" value is a string within a set of valid values, and
-- that the instance satisfies another schema, where this other schema is chosen
+- That the instance is an object,
+- That the instance has a particular "disciminator" property,
+- That this "discriminator" value is a string within a set of valid values, and
+- That the instance satisfies another schema, where this other schema is chosen
   based on the value of the "discriminator" property.
 
 If a schema is of the "disciminator" form, then:
@@ -579,28 +636,35 @@ If a schema is of the "disciminator" form, then:
    `schemaPath` pointing to the `discriminator` member.
 
 2. If the instance is a JSON object and lacks a member whose name equals the
-   `propertyName` value of the `discriminator` of the schema, then the instance
-   is rejected.
+   `tag` value of the `discriminator` of the schema, then the instance is
+   rejected.
 
    The standard error to produce in this case has an `instancePath` pointing to
-   the instance, and a `schemaPath` pointing to the `propertyName` member of the
+   the instance, and a `schemaPath` pointing to the `tag` member of the
    `disciminator` member of the schema.
 
-3. If the instance is a JSON object and has a member whose name equals the
-   `propertyName` value of the `discriminator` of the schema, but that member's
-   value is not equal to any of the member names in the `mapping` of the
-   `discriminator`, then the instance is rejected.
+3. If the instance is a JSON object and has a member whose name equals the `tag`
+   value of the `discriminator` of the schema, but that member's value is not a
+   string, then the instance is rejected.
 
    The standard error to produce in this case has an `instancePath` pointing to
-   the member of the instance corresponding to `propertyName`, and a
-   `schemaPath` pointing to the `mapping` member of the `discriminator` member
-   of the schema.
+   the member of the instance corresponding to `tag`, and a `schemaPath`
+   pointing to the `tag` member of the discriminator.
 
-4. If the instance is a JSON object and has a member whose name equals the
-   `propertyName` value of the `discriminator` of the schema, and that member's
-   value is equal to one of the member names in the `mapping` of the
-   `discriminator`, then the instance must satisfy this corresponding schema in
-   `mapping`. Otherwise, the instance is rejected.
+4. If the instance is a JSON object and has a member whose name equals the `tag`
+   value of the `discriminator` of the schema and whose value is a string, but
+   that member's value is not equal to any of the member names in the `mapping`
+   of the `discriminator`, then the instance is rejected.
+
+   The standard error to produce in this case has an `instancePath` pointing to
+   the member of the instance corresponding to `tag`, and a `schemaPath`
+   pointing to the `mapping` member of the `discriminator` member of the schema.
+
+5. If the instance is a JSON object and has a member whose name equals the `tag`
+   value of the `discriminator` of the schema, and that member's value is equal
+   to one of the member names in the `mapping` of the `discriminator`, then the
+   instance must satisfy this corresponding schema in `mapping`. Otherwise, the
+   instance is rejected.
 
    The standard errors to produce in this case are those produced by evaluating
    the instance against the schema within the `mapping`.
@@ -610,7 +674,7 @@ For example, if we have the schema:
 ```json
 {
   "discriminator": {
-    "propertyName": "version",
+    "tag": "version",
     "mapping": {
       "v1": {
         "properties": {
@@ -648,7 +712,19 @@ If we instead evaluate the instance:
 Then the standard errors are:
 
 ```json
-[{ "instancePath": "", "schemaPath": "/discriminator/propertyName" }]
+[{ "instancePath": "", "schemaPath": "/discriminator/tag" }]
+```
+
+If we instead evaluate the instance:
+
+```json
+{ "version": 1 }
+```
+
+Then the standard errors are:
+
+```json
+[{ "instancePath": "/version", "schemaPath": "/discriminator/tag" }]
 ```
 
 If we instead evaluate the instance:
@@ -691,19 +767,19 @@ No IANA considerations.
 
 # Security Considerations
 
-Implementations of JSON Schema will necessarily be manipulating JSON data.
-Therefore, the security considerations of [@!RFC8259] are all relevant here.
+Implementations of JSON Schema Language will necessarily be manipulating JSON
+data. Therefore, the security considerations of [@!RFC8259] are all relevant
+here.
 
 Implementations which evaluate user-inputted schemas **SHOULD** implement
 mechanisms to detect, and abort, circular references which might cause a naive
 implementation to go into an infinite loop. Without such mechanisms,
 implementations may be vulnerable to denial-of-service attacks.
 
-# Acknowledgments
-
-Thanks to Gary Court, Francis Galiegue, Kris Zyp, Geraint Luff, Jason
-Desrosiers, Daniel Perrett, Erik Wilde, Ben Hutton, Evgeny Poberezkin, Brad
-Bowman, Gowry Sankar, Donald Pipowitch, Dave Finlay, Denis Laxalde, Henry
-Andrews, and Austin Wright for their work on the initial drafts of JSON Schema.
+Implementations of JSON Schema Language **SHOULD NOT** naively attempt to fetch
+and evaluate schemas when they are referred to using the `ref` keyword. Doing so
+could lead to denial of service. Instead, implementations should only fetch
+schemas through secure channels, and should only fetch and evaluate schemas from
+trusted sources.
 
 {backmatter}
