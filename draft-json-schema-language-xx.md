@@ -1,7 +1,7 @@
 ---
 title: JSON Schema Language
 docname: draft-json-schema-language-00
-date: 2019-03-28
+date: 2019-04-28
 ipr: trust200902
 area: Applications
 wg: JSON Working Group
@@ -27,7 +27,9 @@ normative:
 
 --- abstract
 
-TODO Abstract
+JavaScript Object Notation (JSON) Schema Language is a portable method for
+describing the format of JSON data and the errors associated with ill-formed
+data.
 
 --- middle
 
