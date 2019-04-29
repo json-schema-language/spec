@@ -1,28 +1,35 @@
-%%%
-Title = "JavaScript Object Notation (JSON) Schema Language"
-area = "Internet"
-workgroup = "Internet Engineering Task Force"
+---
+title: JSON Schema Language
+docname: draft-json-schema-language-00
+date: 2019-03-28
+ipr: trust200902
+area: Applications
+wg: JSON Working Group
+kw: Internet-Draft
+cat: std
 
-[seriesInfo]
-name = "Internet-Draft"
-value = "draft-ucarion-00"
-stream = "IETF"
-status = "standard"
+coding: us-ascii
+pi:
+  toc: yes
+  sortrefs:
+  symrefs: yes
 
-[[author]]
-initials = "U."
-surname = "Carion"
-fullname = "Ulysse Carion"
-[author.address]
-email = "ulyssecarion@gmail.com"
-%%%
+author:
+  - ins: U. Carion
+    name: Ulysse Carion
+    email: ulyssecarion@gmail.com
 
-.# Abstract
+normative:
+  RFC2119:
+  RFC3986:
+  RFC6901:
+  RFC8259:
 
-This document describes JavaScript Object Notation (JSON) Schema Language, a
-portable method for describing the format of JSON data.
+--- abstract
 
-{mainmatter}
+TODO Abstract
+
+--- middle
 
 # Introduction
 
@@ -42,13 +49,13 @@ collection of other schemas (an "evaluation context").
 
 The keywords **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**,
 **SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **MAY**, and **OPTIONAL**, when
-they appear in this document, are to be interpreted as described in [@RFC2119].
+they appear in this document, are to be interpreted as described in {{RFC2119}}.
 
 The terms "absolute-URI" and "URI-reference", when they appear in this document,
-are to be understood as they are defined in [@!RFC3986].
+are to be understood as they are defined in {{RFC3986}}.
 
 The term "JSON Pointer", when it appears in this document, is to be understood
-as it is defined in [@!RFC6901].
+as it is defined in {{RFC6901}}.
 
 # Terminology
 
@@ -104,29 +111,29 @@ combinations are called "forms". Correct schemas **MUST** fall into exactly one
 of the following forms:
 
 - The "empty" form: the schema may have members with the name `id` and/or
-  `definitions`, but none of the other keywords listed in (#schema-keywords).
+  `definitions`, but none of the other keywords listed in {{schema-keywords}}.
 - The "ref" form: the schema may have members with the name `id`, `definitions`,
-  and/or `ref`, but none of the other keywords listed in (#schema-keywords).
+  and/or `ref`, but none of the other keywords listed in {{schema-keywords}}.
 - The "type" form: the schema may have members with the name `id`,
   `definitions`, and/or `type`, but none of the other keywords listed in
-  (#schema-keywords).
+  {{schema-keywords}}.
 - The "elements" form: the schema may have members with the name `id`,
   `definitions`, and/or `elements`, but none of the other keywords listed in
-  (#schema-keywords).
+  {{schema-keywords}}.
 - The "properties" form: the schema may have members with the name `id`,
   `definitions`, `properties`, and/or `optionalProperties`, but none of the
-  other keywords listed in (#schema-keywords).
+  other keywords listed in {{schema-keywords}}.
 - The "values" form: the schema may have members with the name `id`,
   `definitions`, and/or `values`, but none of the other keywords listed in
-  (#schema-keywords).
+  {{schema-keywords}}.
 - The "discriminator" form: the schema may have members with the name `id`,
   `definitions`, and/or `discriminator`, but none of the other keywords listed
-  in (#schema-keywords).
+  in {{schema-keywords}}.
 
 ## Additional restrictions to prevent ambiguity
 
 To prevent ambiguous or unsatisfiable schemas during evaluation (see
-(#evaluation)), there are two additional constraints that all JSON documents
+{{evaluation}}), there are two additional constraints that all JSON documents
 must satisfy to be a valid schema:
 
 1. If a schema both `properties` and `optionalProperties` members, the
@@ -138,7 +145,7 @@ must satisfy to be a valid schema:
 
 2. If a schema has a `discriminator` member, all of the values of `mapping`
    within `discriminator` **MUST** be of the "properties" form described in
-   (#forms). Furthermore, these schemas within `mapping` **MUST NOT** have a
+   {{forms}}. Furthermore, these schemas within `mapping` **MUST NOT** have a
    member in `properties` or `optionalProperties` whose name equals that of
    `tag`'s within `discriminator`.
 
@@ -150,17 +157,17 @@ must satisfy to be a valid schema:
 To illustrate the first restriction, the following JSON document is not a valid
 schema, as `foo` appears both in `properties` and `optionalProperties`:
 
-```json
+~~~ json
 {
   "properties": { "foo": {} },
   "optionalProperties": { "foo": {} }
 }
-```
+~~~
 
 To illsturate the second restriction, the following JSON document is not a valid
 schema because one of the members of `mapping` is not of the "properties" form:
 
-```json
+~~~ json
 {
   "discriminator": {
     "tag": "foo",
@@ -169,13 +176,13 @@ schema because one of the members of `mapping` is not of the "properties" form:
     }
   }
 }
-```
+~~~
 
 Finally, the following JSON document is not a valid schema because one of
 the members of `mapping` has a `properties` member whose value equals that of
 `tag`'s:
 
-```json
+~~~ json
 {
   "discriminator": {
     "tag": "foo",
@@ -184,7 +191,7 @@ the members of `mapping` has a `properties` member whose value equals that of
     }
   }
 }
-```
+~~~
 
 ## Evaluation context and reference resolution {#ref-resolution}
 
@@ -199,14 +206,14 @@ If a schema is correct and it has a member named `ref`, then this member is said
 to be a reference. The reference of a correct schema **MUST** be resolvable.
 Reference resolution is defined as follows:
 
-1. By (#schema-keywords), a schema may be contained by another schema. Reference
-   resolution uses the "root" of a schema to determine a base URI. The "root" of
-   a given schema is the immediate element of an evaluation context which
-   contains the given schema. All schemas are, for this definition, considered
-   to contain themselves.
+1. By {{schema-keywords}}, a schema may be contained by another schema.
+   Reference resolution uses the "root" of a schema to determine a base URI. The
+   "root" of a given schema is the immediate element of an evaluation context
+   which contains the given schema. All schemas are, for this definition,
+   considered to contain themselves.
 
-2. By (#schema-keywords), the value of the reference must be a URI-reference.
-   This URI-reference is resolved using the process described in [@!RFC3986] to
+2. By {{schema-keywords}}, the value of the reference must be a URI-reference.
+   This URI-reference is resolved using the process described in {{RFC3986}} to
    produce a resolved URI. If the root of a schema has a member named `id`, then
    that member's corresponding value shall be used as the base URI for the URI
    resolution process; otherwise, no base URI is used.
@@ -230,14 +237,14 @@ Reference resolution is defined as follows:
 
 For example, if an evaluation context contains two schemas:
 
-```json
+~~~ json
 {
   "id": "http://example.com",
   "ref": "/foo#a"
 }
-```
+~~~
 
-```json
+~~~ json
 {
   "id": "http://example.com/foo",
   "definitions": {
@@ -250,7 +257,7 @@ For example, if an evaluation context contains two schemas:
     }
   }
 }
-```
+~~~
 
 Then the reference with value `/foo#a` refers to the `a` definition of the
 schema with ID `http://example.com/foo`. Both of the references with value `#`
@@ -273,8 +280,8 @@ another for instances), determine whether unspecified members are acceptable.
 
 When evaluation is using strict schema semantics, then a correct schema **MUST
 NOT** contain members whose names are outside the list of keywords described in
-(#schema-keywords). When evaluation is not using strict schema semantics, then a
-correct schema **MAY** contain members whose names are outside this list.
+{{schema-keywords}}. When evaluation is not using strict schema semantics, then
+a correct schema **MAY** contain members whose names are outside this list.
 
 Implementations **MAY** allow users to choose whether to use strict schema
 semantics. Implementations **SHOULD** document whether they use strict schema
@@ -282,7 +289,7 @@ semantics by default.
 
 ### Strict instance semantics
 
-See (#eval-props-form) for how strict instance semantics affects whether an
+See {{eval-props-form}} for how strict instance semantics affects whether an
 instance is valid with respect to a schema.
 
 Implementations **MAY** allow users to choose whether to use strict instance
@@ -307,11 +314,11 @@ three members:
   rejected the instance.
 - A member with the name `schemaURI`, whose value is an absolute-URI. This URI
   will be the `id` value of the root schema of the schema that rejected the
-  instance. See (#ref-resolution) for a definition of a schema's root. If the
+  instance. See {{ref-resolution}} for a definition of a schema's root. If the
   root schema lacks an `id` value, then the `schemaURI` member shall be omitted.
 
 The values for `instancePath` and `schemaPath` depend on the form of the schema,
-and are described in detail in (#evaluation).
+and are described in detail in {{evaluation}}.
 
 ## Evaluation {#evaluation}
 
@@ -329,34 +336,34 @@ The "ref" form is meant to enable schema re-use.
 If a schema is of the "ref" form, then it accepts an instance if and only if the
 schema which the `ref` member resolves to accepts the instance. The standard
 errors to produce are the same as those that the referent schema produces. The
-resolution of a `ref` member is described in (#ref-resolution).
+resolution of a `ref` member is described in {{ref-resolution}}.
 
 For example, if we evaluate the instance:
 
-```json
+~~~ json
 "example"
-```
+~~~
 
 Against the schema:
 
-```json
+~~~ json
 {
   "ref": "http://example.com"
 }
-```
+~~~
 
 Within an evaluating context containing the schema:
 
-```json
+~~~ json
 {
   "id": "http://example.com",
   "type": "number"
 }
-```
+~~~
 
 Then the standard errors are:
 
-```json
+~~~ json
 [
   {
     "instancePath": "",
@@ -364,9 +371,9 @@ Then the standard errors are:
     "schemaURI": "http://example.com"
   }
 ]
-```
+~~~
 
-See (#eval-type-form) for how the `type` member produces errors, as the errors
+See {{eval-type-form}} for how the `type` member produces errors, as the errors
 in the example above compose upon `type` errors.
 
 ### Type form {#eval-type-form}
@@ -390,21 +397,21 @@ the `type` member.
 
 For example, if we evaluate the instance:
 
-```json
+~~~ json
 "example"
-```
+~~~
 
 Against the schema:
 
-```json
+~~~ json
 { "type": "number" }
-```
+~~~
 
 Then the standard errors are:
 
-```json
+~~~ json
 [{ "instancePath": "", "schemaPath": "/type" }]
-```
+~~~
 
 ### Elements form
 
@@ -426,40 +433,40 @@ If a schema is of the "elements" form, then:
 
 For example, if we have the schema:
 
-```json
+~~~ json
 {
   "elements": {
     "type": "number"
   }
 }
-```
+~~~
 
 Then if we evaluate the instance:
 
-```json
+~~~ json
 "example"
-```
+~~~
 
 Against this schema, the standard errors are:
 
-```json
+~~~ json
 [{ "instancePath": "", "schemaPath": "/elements" }]
-```
+~~~
 
 If instead we evaluate the instance:
 
-```json
+~~~ json
 [1, 2, "foo", 3, "bar"]
-```
+~~~
 
 The standard errors are:
 
-```json
+~~~ json
 [
   { "instancePath": "/2", "schemaPath": "/elements/type" },
   { "instancePath": "/4", "schemaPath": "/elements/type" }
 ]
-```
+~~~
 
 ### Properties form {#eval-props-form}
 
@@ -515,7 +522,7 @@ standard errors should be concatenated together.
 
 For example, if we have the schema:
 
-```json
+~~~ json
 {
   "properties": {
     "a": { "type": "string" },
@@ -526,36 +533,40 @@ For example, if we have the schema:
     "d": { "type": "string" }
   }
 }
-```
+~~~
 
 Then if we evaluate the instance:
 
-```json
+~~~ json
 "example"
-```
+~~~
 
 Against this schema, then the standard errors are:
 
-```json
+~~~ json
 [{ "instancePath": "", "schemaPath": "/properties" }]
-```
+~~~
 
 If instead we evalute the instance:
 
-```json
+~~~ json
 { "b": 3, "c": 3, "e": 3 }
-```
+~~~
 
 The standard errors, using strict instance semantics, are:
 
-```json
+~~~ json
 [
-  { "instancePath": "", "schemaPath": "/properties/a" },
-  { "instancePath": "/b", "schemaPath": "/properties/b/type" },
-  { "instancePath": "/c", "schemaPath": "/optionalProperties/c/type" },
-  { "instancePath": "/e", "schemaPath": "" }
+  { "instancePath": "",
+    "schemaPath": "/properties/a" },
+  { "instancePath": "/b",
+    "schemaPath": "/properties/b/type" },
+  { "instancePath": "/c",
+    "schemaPath": "/optionalProperties/c/type" },
+  { "instancePath": "/e",
+    "schemaPath": "" }
 ]
-```
+~~~
 
 If we the same instance were evaluated, but without strict instance semantics,
 the final element of the above array of errors would not be present.
@@ -582,40 +593,40 @@ If a schema is of the "values" form, then:
 
 For example, if we have the schema:
 
-```json
+~~~ json
 {
   "values": {
     "type": "number"
   }
 }
-```
+~~~
 
 Then if we evaluate the instance:
 
-```json
+~~~ json
 "example"
-```
+~~~
 
 Against this schema, the standard errors are:
 
-```json
+~~~ json
 [{ "instancePath": "", "schemaPath": "/values" }]
-```
+~~~
 
 If instead we evaluate the instance:
 
-```json
+~~~ json
 { "a": 1, "b": 2, "c": "foo", "d": 3, "e": "bar" }
-```
+~~~
 
 The standard errors are:
 
-```json
+~~~ json
 [
   { "instancePath": "/c", "schemaPath": "/values/type" },
   { "instancePath": "/e", "schemaPath": "/values/type" }
 ]
-```
+~~~
 
 ### Discriminator form
 
@@ -671,7 +682,7 @@ If a schema is of the "disciminator" form, then:
 
 For example, if we have the schema:
 
-```json
+~~~ json
 {
   "discriminator": {
     "tag": "version",
@@ -689,77 +700,80 @@ For example, if we have the schema:
     }
   }
 }
-```
+~~~
 
 Then if we evaluate the instance:
 
-```json
+~~~ json
 "example"
-```
+~~~
 
 Against this schema, the standard errors are:
 
-```json
+~~~ json
 [{ "instancePath": "", "schemaPath": "/discriminator" }]
-```
+~~~
 
 If we instead evaluate the instance:
 
-```json
+~~~ json
 {}
-```
+~~~
 
 Then the standard errors are:
 
-```json
+~~~ json
 [{ "instancePath": "", "schemaPath": "/discriminator/tag" }]
-```
+~~~
 
 If we instead evaluate the instance:
 
-```json
+~~~ json
 { "version": 1 }
-```
+~~~
 
 Then the standard errors are:
 
-```json
+~~~ json
 [{ "instancePath": "/version", "schemaPath": "/discriminator/tag" }]
-```
+~~~
 
 If we instead evaluate the instance:
 
-```json
+~~~ json
 {
   "version": "v3"
 }
-```
+~~~
 
 Then the standard errors are:
 
-```json
-[{ "instancePath": "/version", "schemaPath": "/discriminator/mapping" }]
-```
+~~~ json
+[
+  { "instancePath": "/version",
+    "schemaPath": "/discriminator/mapping" }
+]
+~~~
 
 Finally, if the instance evaluated were:
 
-```json
+~~~ json
 {
   "version": "v2",
   "a": 3
 }
-```
+~~~
 
 Then the standard errors are:
 
-```json
+~~~ json
 [
   {
     "instancePath": "/a",
     "schemaPath": "/discriminator/mapping/v2/properties/a/type"
   }
 ]
-```
+~~~
 
 # IANA Considerations
 
@@ -768,7 +782,7 @@ No IANA considerations.
 # Security Considerations
 
 Implementations of JSON Schema Language will necessarily be manipulating JSON
-data. Therefore, the security considerations of [@!RFC8259] are all relevant
+data. Therefore, the security considerations of {{RFC8259}} are all relevant
 here.
 
 Implementations which evaluate user-inputted schemas **SHOULD** implement
@@ -782,4 +796,12 @@ could lead to denial of service. Instead, implementations should only fetch
 schemas through secure channels, and should only fetch and evaluate schemas from
 trusted sources.
 
-{backmatter}
+--- back
+
+# Acknowledgments
+
+Thanks to Gary Court, Francis Galiegue, Kris Zyp, Geraint Luff, Jason
+Desrosiers, Daniel Perrett, Erik Wilde, Ben Hutton, Evgeny Poberezkin, Brad
+Bowman, Gowry Sankar, Donald Pipowitch, Dave Finlay, Denis Laxalde, Henry
+Andrews, and Austin Wright for their work on the initial drafts of JSON Schema,
+which inspired JSON Schema Language.
