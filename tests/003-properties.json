@@ -67,7 +67,7 @@
         "errors": [
           {
             "instancePath": "/baz",
-            "schemaPath": "/properties",
+            "schemaPath": "",
             "schemaURI": ""
           }
         ]
@@ -287,7 +287,7 @@
         "errors": [
           {
             "instancePath": "/baz",
-            "schemaPath": "/optionalProperties",
+            "schemaPath": "",
             "schemaURI": ""
           }
         ]
