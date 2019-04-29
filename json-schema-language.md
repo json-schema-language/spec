@@ -14,7 +14,7 @@ initials = "U."
 surname = "Carion"
 fullname = "Ulysse Carion"
 [author.address]
-email = "ulysse@ulysse.io"
+email = "ulyssecarion@gmail.com"
 %%%
 
 .# Abstract
