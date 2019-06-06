@@ -1,7 +1,7 @@
 ---
 title: JSON Schema Language
-docname: draft-json-schema-language-00
-date: 2019-04-28
+docname: draft-json-schema-language-01
+date: 2019-05-31
 ipr: trust200902
 area: Applications
 wg: JSON Working Group
@@ -21,37 +21,65 @@ author:
 
 normative:
   RFC2119:
+  RFC3339:
   RFC3986:
   RFC6901:
   RFC8259:
+  RFC8174:
 
 --- abstract
 
 JavaScript Object Notation (JSON) Schema Language is a portable method for
-describing the format of JSON data and the errors associated with ill-formed
-data.
+describing the format of JSON ({{RFC8259}}, JavaScript Object Notation) data and
+the errors associated with ill-formed data.
 
 --- middle
 
 # Introduction
 
-JSON Schema Language is a schema language for JSON data. This document
-specifies:
+This document describes a schema language for JSON {{RFC8259}} called JSON
+Schema Language (JSL).
 
-- When a JSON object is a correct JSON Schema Language schema
-- When a JSON document is valid with respect to a correct JSON Schema Language
-  schema
-- A standardized form of errors to produce when validating a JSON value
+The goals of JSL are to:
 
-JSON Schema Language is centered around the question of validating a JSON value
-(an "instance") against a JSON object (a "schema"), within the context of a
-collection of other schemas (an "evaluation context").
+- Provide an unambiguous description of the overall structure of a JSON
+  document.
 
-# Conventions
+- Be able to describe common JSON datatypes and structures.
 
-The keywords **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**,
-**SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **MAY**, and **OPTIONAL**, when
-they appear in this document, are to be interpreted as described in {{RFC2119}}.
+- Provide a single format that is readable and editable by both humans and
+  machines, and which can be embedded within other JSON documents.
+
+- Enable code generation from schemas.
+
+- Provide a standardized format for errors when data does not conform with a
+  schema.
+
+JSL is intentionally designed as a rather minimal schema language. For example,
+JSL is homoiconic (it both describes, and is written in, JSON) yet is incapable
+of describing in detail its own structure. By keeping the expressiveness of the
+schema language minimal, JSL makes code generation and standardized errors
+easier to implement.
+
+It is expected that for many use-cases, a schema language of JSL's
+expressiveness is sufficient. Where a more expressive language is required,
+alternatives exist in CDDL and others.
+
+This document has the following structure:
+
+The syntax of JSL is defined in {{syntax}}. {{semantics}} describes the
+semantics of JSL; this includes determining whether some data satisfies a schema
+and what errors should be produced when the data is unsatisfactory.
+{{comparison-with-cddl}} presents various JSL schemas and their CDDL
+equivalents.
+
+## Requirements notation
+
+The keywords MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD, SHOULD NOT,
+RECOMMENDED, MAY, and OPTIONAL, when they appear in this document, are to be
+interpreted as described in {{RFC2119}} {{RFC8174}}.
+
+## Terminology
 
 The terms "absolute-URI" and "URI-reference", when they appear in this document,
 are to be understood as they are defined in {{RFC3986}}.
@@ -59,379 +87,493 @@ are to be understood as they are defined in {{RFC3986}}.
 The term "JSON Pointer", when it appears in this document, is to be understood
 as it is defined in {{RFC6901}}.
 
-# Terminology
-
-- instance: A JSON value being validated.
-- schema: A JSON object describing the form of valid instances.
-- evaluation context: A collection of schemas which may refer to one another.
-- validation error: A JSON object representing a reason why an instance is
-  invalid.
+The term "instance", when it appears in this document, refers to a JSON value
+being validated against a JSL schema.
 
 # Syntax {#syntax}
 
-This section specifies when a JSON document is a correct schema.
+This section describes when a JSON document is a correct JSL schema.
 
-## Keywords {#schema-keywords}
+A correct JSL schema MUST match the `schema` CDDL rule described in this
+section. A JSL schema is a JSON object taking on an appropriate form. It may
+optionally contain definitions (a mapping from names to schemas) and additional
+data.
 
-Some member names of a schema are reserved, and carry special meaning. These
-member names are called keywords. Correct schemas **MUST** satisfy the following
-requirements:
-
-- `id`: If a schema has a member named `id`, its corresponding value **MUST** be
-  a JSON string encoding an absolute-URI.
-- `definitions`: If a schema has a member named `definitions`, its corresponding
-  value **MUST** be a JSON object. The values of this object **MUST** all be
-  correct schemas.
-- `ref`: If a schema has a member named `ref`, its corresponding value **MUST**
-  be a JSON string encoding a URI-reference.
-- `type`: If a schema has a member named `type`, its corresponding value
-  **MUST** be a JSON string encoding one of the values `null`, `boolean`,
-  `number`, or `string`.
-- `elements`: If a schema has a member named `elements`, its corresponding value
-  **MUST** be a JSON object. This object **MUST** be a correct schema.
-- `properties`: If a schema has a member named `properties`, its corresponding
-  value **MUST** be a JSON object. The values of this object **MUST** all be
-  correct schemas.
-- `optionalProperties`: If a schema has a member named `optionalProperties`, its
-  corresponding value **MUST** be a JSON object. The values of this object
-  **MUST** all be correct schemas.
-- `values`: If a schema has a member named `values`, its corresponding value
-  **MUST** be a JSON object. This object **MUST** be a correct schema.
-- `discriminator`: If a schema has a member named `discriminator`, its
-  corresponding value **MUST** be a JSON object. This object **MUST** have
-  exactly two members:
-
-  - A member with the name `tag`, whose corresponding value **MUST** be a JSON
-    string.
-  - A member with the name `mapping`, whose corresponding value **MUST** be a
-    JSON object. The values of this object **MUST** all be correct schemas.
-
-## Forms {#forms}
-
-Only certain combinations of schema keywords are correct. These valid
-combinations are called "forms". Correct schemas **MUST** fall into exactly one
-of the following forms:
-
-- The "empty" form: the schema may have members with the name `id` and/or
-  `definitions`, but none of the other keywords listed in {{schema-keywords}}.
-- The "ref" form: the schema may have members with the name `id`, `definitions`,
-  and/or `ref`, but none of the other keywords listed in {{schema-keywords}}.
-- The "type" form: the schema may have members with the name `id`,
-  `definitions`, and/or `type`, but none of the other keywords listed in
-  {{schema-keywords}}.
-- The "elements" form: the schema may have members with the name `id`,
-  `definitions`, and/or `elements`, but none of the other keywords listed in
-  {{schema-keywords}}.
-- The "properties" form: the schema may have members with the name `id`,
-  `definitions`, `properties`, and/or `optionalProperties`, but none of the
-  other keywords listed in {{schema-keywords}}.
-- The "values" form: the schema may have members with the name `id`,
-  `definitions`, and/or `values`, but none of the other keywords listed in
-  {{schema-keywords}}.
-- The "discriminator" form: the schema may have members with the name `id`,
-  `definitions`, and/or `discriminator`, but none of the other keywords listed
-  in {{schema-keywords}}.
-
-## Additional restrictions to prevent ambiguity
-
-To prevent ambiguous or unsatisfiable schemas during evaluation (see
-{{evaluation}}), there are two additional constraints that all JSON documents
-must satisfy to be a valid schema:
-
-1. If a schema both `properties` and `optionalProperties` members, the
-   `properties` and `optionalProperties` values **MUST NOT** share any member
-   names in common.
-
-   Without this restriction, it could be ambiguous whether a property is
-   required or not.
-
-2. If a schema has a `discriminator` member, all of the values of `mapping`
-   within `discriminator` **MUST** be of the "properties" form described in
-   {{forms}}. Furthermore, these schemas within `mapping` **MUST NOT** have a
-   member in `properties` or `optionalProperties` whose name equals that of
-   `tag`'s within `discriminator`.
-
-   Without this restriction, it could be possible for a schema to require that
-   an instance be simultaneously an object and not an object. Additionally,
-   schemas might also give contradictory requirements by describing the same
-   instance member through both `tag` and `properties`.
-
-To illustrate the first restriction, the following JSON document is not a valid
-schema, as `foo` appears both in `properties` and `optionalProperties`:
-
-~~~ json
-{
-  "properties": { "foo": {} },
-  "optionalProperties": { "foo": {} }
+~~~ cddl
+schema = {
+  form,
+  ? definitions: { * tstr => schema }
 }
 ~~~
 
-To illsturate the second restriction, the following JSON document is not a valid
-schema because one of the members of `mapping` is not of the "properties" form:
+This is not a correct JSL schema, as its `definitions` object contains a number,
+which is not a schema:
 
 ~~~ json
-{
-  "discriminator": {
-    "tag": "foo",
-    "mapping": {
-      "a": { "elements": {} }
-    }
-  }
-}
+{ "definitions": { "foo": 3 }}
 ~~~
 
-Finally, the following JSON document is not a valid schema because one of
-the members of `mapping` has a `properties` member whose value equals that of
-`tag`'s:
+JSL schemas can take on one of eight forms. These forms are defined so as to be
+mutually exclusive; a schema cannot satisfy multiple forms at once.
 
-~~~ json
-{
-  "discriminator": {
-    "tag": "foo",
-    "mapping": {
-      "a": { "properties": { "foo": { "type": "number" } } }
-    }
-  }
-}
+~~~ cddl
+form = empty /
+  ref /
+  type /
+  enum /
+  elements /
+  properties /
+  values /
+  discriminator
 ~~~
 
-## Evaluation context and reference resolution {#ref-resolution}
+The first form, `empty`, is trivial. It is meant for matching any instance:
 
-An evaluation context is a collection of schemas which may refer to one another.
-An evaluation context is correct if:
-
-- All of its constituent schemas are correct,
-- No two constituent schemas have the same `id` value, and
-- No more than one schema lacks an `id` value.
-
-If a schema is correct and it has a member named `ref`, then this member is said
-to be a reference. The reference of a correct schema **MUST** be resolvable.
-Reference resolution is defined as follows:
-
-1. By {{schema-keywords}}, a schema may be contained by another schema.
-   Reference resolution uses the "root" of a schema to determine a base URI. The
-   "root" of a given schema is the immediate element of an evaluation context
-   which contains the given schema. All schemas are, for this definition,
-   considered to contain themselves.
-
-2. By {{schema-keywords}}, the value of the reference must be a URI-reference.
-   This URI-reference is resolved using the process described in {{RFC3986}} to
-   produce a resolved URI. If the root of a schema has a member named `id`, then
-   that member's corresponding value shall be used as the base URI for the URI
-   resolution process; otherwise, no base URI is used.
-
-   If the URI-reference cannot be resolved, then the reference is unresolvable.
-
-3. Take the URI from (2), and remove its fragment part, if present.
-
-4. Find the element of the evaluation context which has a member named `id` and
-   whose value equals the URI from (3). If there does not exist such a schema,
-   then the reference is unresolvable.
-
-5. If URI from (2) has no fragment, then the reference resolves to the schema
-   from (4).
-
-6. Otherwise, the schema from (4) must have a member named `definitions`; if it
-   does not, then the reference is unresolvable. Furthermore, the `definitions`
-   value must have a member whose name equals the fragment of the URI from (2);
-   if it does not, then the reference is unresolvable. If it does have such a
-   member, then the reference resolves to this member's value.
-
-For example, if an evaluation context contains two schemas:
-
-~~~ json
-{
-  "id": "http://example.com",
-  "ref": "/foo#a"
-}
+~~~ cddl
+empty = {}
 ~~~
 
+Thus, this is a correct schema:
+
+~~~ cddl
+{}
+~~~
+
+The second form, `ref`, is for when a schema is meant to be defined in terms of
+something in `definitions`:
+
+~~~ cddl
+ref = { ref: tstr }
+~~~
+
+In a correct schema, the `ref` value must always refer to a definition at the
+root level of a schema. Note well: the *root* level of the schema. Definitions
+at the non-root level are immaterial. More formally:
+
+Let *D* be the member of the root schema with the name `definitions`. For all
+schemas *S* of the ref form in the root schema, let *R* be the value of the
+member of *S* with the name `ref`. In a correct schema, *D* MUST exist and MUST
+have a member with a name equal to *R*.
+
+Here is an example of ref's use to avoid re-defining the same thing twice:
+
 ~~~ json
 {
-  "id": "http://example.com/foo",
   "definitions": {
-    "a": {
-      "ref": "#"
+    "coordinates": {
+      "properties": {
+        "lat": { "type": "number" },
+        "lng": { "type": "number" }
+      }
+    }
+  },
+  "properties": {
+    "user_location": { "ref": "coordinates" },
+    "server_location": { "ref": "coordinates" }
+  }
+}
+~~~
+
+However, this schema is incorrect, as it refers to a definition that doesn't
+exist:
+
+~~~ json
+{
+  "definitions": { "foo": { "type": "number" }},
+  "ref": "bar"
+}
+~~~
+
+This schema is incorrect as well, as it refers to a definition that doesn't
+exist at the root level. The non-root definition is immaterial:
+
+~~~ json
+{
+  "definitions": { "foo": { "type": "number" }},
+  "elements": {
+    "definitions": { "bar": { "type": "number" }},
+    "ref": "bar"
+  }
+}
+~~~
+
+The third form, `type`, constrains instances to have a particular primitive
+type. The precise meaning of each of the primitive types is described in
+{{semantics}}.
+
+~~~ cddl
+type = { type: "boolean" / "number" / "string" / "timestamp" }
+~~~
+
+For example, this schema constrains instances to be strings that are correct
+{{RFC3339}} timestamps:
+
+~~~ json
+{ "type": "timestamp" }
+~~~
+
+The fourth form, `enum`, describes instances whose value must be one of a
+finite, predetermined set of values:
+
+~~~ cddl
+enum = { enum: [+ tstr] }
+~~~
+
+The values within `[+ tstr]` MUST NOT contain duplicates. Thus, the following is
+a correct schema:
+
+~~~ json
+{ "enum": ["IN_PROGRESS", "DONE", "CANCELED"] }
+~~~
+
+But this is not a correct schema, as `B` is duplicated:
+
+~~~ json
+{ "enum": ["A", "B", "B"] }
+~~~
+
+The fifth form, `elements`, describes instances that must be arrays. A further
+sub-schema describes the elements of the array.
+
+~~~ cddl
+elements = { elements: schema }
+~~~
+
+Here is a schema describing an array of {{RFC3339}} timestamps:
+
+~~~ json
+{ "elements": { "type": "timestamp" }}
+~~~
+
+The sixth form, `properties`, describes JSON objects being used as a "struct". A
+schema of this form specifies the names of required and optional properties, as
+well as the schemas each of those properties must satisfy:
+
+~~~ cddl
+; One of properties or optionalProperties may be omitted,
+; but not both.
+properties = with-properties / with-optional-properties
+
+with-properties = {
+  properties: * tstr => schema,
+  ? optionalProperties * tstr => schema
+}
+
+with-optional-properties = {
+  ? properties: * tstr => schema,
+  optionalProperties: * tstr => schema
+}
+~~~
+
+If a schema has both a member named `properties` (with value *P*) and another
+member named `optionalProperties` (with value *O*), then *O* and *P* MUST NOT
+have any member names in common. This is to prevent ambiguity as to whether a
+property is optional or required.
+
+Thus, this is not a correct schema, as `confusing` appears in both `properties`
+and `optionalProperties`:
+
+~~~ json
+{
+  "properties": { "confusing": {} },
+  "optionalProperties": { "confusing": {} }
+}
+~~~
+
+Here is a correct schema, describing a paginated list of users:
+
+~~~ json
+{
+  "properties": {
+    "users": {
+      "elements": {
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "create_time": { "type": "timestamp" }
+        },
+        "optionalProperties": {
+          "delete_time": { "type": "timestamp" }
+        }
+      }
     },
-    "b": {
-      "id": "http://example.com/bar",
-      "ref": "#"
+    "next_page_token": { "type": "string" }
+  }
+}
+~~~
+
+The seventh form, `values`, describes JSON objects being used as an associative
+array. A schema of this form specifies the form all member values must satisfy,
+but places no constraints on the member names:
+
+~~~ cddl
+values = { values: * tstr => schema }
+~~~
+
+Thus, this is a correct schema, describing a mapping from strings to numbers:
+
+~~~ json
+{ "values": { "type": "number" }}
+~~~
+
+Finally, the eighth form, `discriminator`, describes JSON objects being used as
+a discriminated union. A schema of this form specifies the "tag" (or
+"discriminator") of the union, as well as a mapping from tag values to the
+appropriate schema to use.
+
+~~~ cddl
+; Note well: the values of mapping are of the properties form.
+discriminator = { tag: tstr, mapping: * tstr => properties }
+~~~
+
+To prevent ambiguous or unsatisfiable contstraints on the "tag" of a
+discriminator, an additional constraint on the discriminator form exists:
+
+Let *T* be the value of the member with the name `tag`, and let *M* be the value
+of the member with the name `mapping`. Then for all values *S* of the members of
+*M*, *S* must not contain members named `properties` or `optionalProperties`
+whose values contain members with a name equal to *T*.
+
+Thus, this is an incorrect schema, as "event_type" is both the value of `tag`
+and a member name in one of the mapping member `properties`:
+
+~~~ json
+{
+  "tag": "event_type",
+  "mapping": {
+    "is_event_type_a_string_or_a_number?": {
+      "properties": { "event_type": { "type": "number" }}
     }
   }
 }
 ~~~
 
-Then the reference with value `/foo#a` refers to the `a` definition of the
-schema with ID `http://example.com/foo`. Both of the references with value `#`
-refer the root schema with ID `http://example.com/foo`. The `id` keyword of the
-`b` definition is irrelevant, as it occurs outside of a root schema.
+However, this is a correct schema, describing a pattern of data common in
+JSON-based messaging systems:
 
-# Semantics
+~~~ json
+{
+  "tag": "event_type",
+  "mapping": {
+    "account_deleted": {
+      "properties": {
+        "account_id": { "type": "string" }
+      }
+    },
+    "account_payment_plan_changed": {
+      "properties": {
+        "account_id": { "type": "string" },
+        "payment_plan": { "enum": ["FREE", "PAID"] }
+      },
+      "optionalProperties": {
+        "upgraded_by": { "type": "string" }
+      }
+    }
+  }
+}
+~~~
 
-This section specifies when an instance is valid against a correct schema,
-within the context of an evaluation context. This section also specifies a
-standardized form of errors to produce when validating an instance.
+# Semantics {#semantics}
 
-## Configuration
+This section describes when an instance is valid against a correct JSL schema,
+and the standardized errors to produce when an instance is invalid.
 
-Users will have different desired behavior with respect to unspecified members
-in a schema or instance. Two distinct sets of semantics (one for schemas,
-another for instances), determine whether unspecified members are acceptable.
+## Strict instance semantics
 
-### Strict schema semantics {#strict-schema}
+Users will have different desired behavior with respect to "unspcecified"
+members in an instance. For example:
 
-When evaluation is using strict schema semantics, then a correct schema **MUST
-NOT** contain members whose names are outside the list of keywords described in
-{{schema-keywords}}. When evaluation is not using strict schema semantics, then
-a correct schema **MAY** contain members whose names are outside this list.
+~~~ json
+{ "properties": { "a": { "type": "string" }}}
+~~~
 
-Implementations **MAY** allow users to choose whether to use strict schema
-semantics. Implementations **SHOULD** document whether they use strict schema
+Some users may expect that `{"a": "foo", "b": "bar"}` satisfies the above
+schema. Others may disagree. JSL addresses this point of contention by leaving
+it to implementations whether to accept such "unspecified" members, or whether
+to reject them.
+
+Rejecting "unspecified" members is called "strict instance semantics". Whether
+to use strict instance semantics is not specified within a schema -- it is
+considered out-of-band information.
+
+Implementations MAY allow users to choose whether to use strict instance
+semantics. Implementations SHOULD document whether they use strict instance
 semantics by default.
 
-### Strict instance semantics
-
-See {{eval-props-form}} for how strict instance semantics affects whether an
-instance is valid with respect to a schema.
-
-Implementations **MAY** allow users to choose whether to use strict instance
-semantics. Implementations **SHOULD** document whether they use strict instance
-semantics by default.
+See {{semantics-form-props}} for how strict instance semantics affects schema
+evaluation.
 
 ## Errors
 
 To facilitate consistent validation error handling, this document specifies a
-standard error format. Implementations **SHOULD** support producing errors in
-this standard form.
+standard error format. Implementations SHOULD support producing errors in this
+standard form.
 
 The standard error format is a JSON array. The order of the elements of this
-array is not specified. The elements of this array are JSON objects with up to
-three members:
+array is not specified. The elements of this array are JSON objects with two
+members:
 
-- A member with the name `instancePath`, whose value is a JSON string containing
-  a JSON Pointer. This JSON Pointer will point to the part of the instance that
+- A member with the name `instancePath`, whose value is a JSON string encoding a
+  JSON Pointer. This JSON Pointer will point to the part of the instance that
   was rejected.
-- A member with the name `schemaPath`, whose value is a JSON string containing a
+- A member with the name `schemaPath`, whose value is a JSON string encoding a
   JSON Pointer. This JSON Pointer will point to the part of the schema that
   rejected the instance.
-- A member with the name `schemaURI`, whose value is an absolute-URI. This URI
-  will be the `id` value of the root schema of the schema that rejected the
-  instance. See {{ref-resolution}} for a definition of a schema's root. If the
-  root schema lacks an `id` value, then the `schemaURI` member shall be omitted.
 
 The values for `instancePath` and `schemaPath` depend on the form of the schema,
-and are described in detail in {{evaluation}}.
+and are described in detail in {{semantics-forms}}.
 
-## Evaluation {#evaluation}
+## Forms {#semantics-forms}
 
-Whether an instance is valid against a schema depends upon the form of the
-schema. This section describes how each form validates instances.
+This section describes, for each of the eight JSL schema forms, the rules
+dictating whether an instance is accepted, as well as the standardized errors to
+produce when an instance is invalid.
 
-### Empty form
+The forms a correct schema may take on are formally described in {{syntax}}.
 
-If a schema is of the "empty" form, then it accepts all instances.
+### Empty
 
-### Ref form
+The empty form is meant to describe instances whose values are unknown,
+unpredictable, or otherwise unconstrained by the schema.
 
-The "ref" form is meant to enable schema re-use.
+If a schema is of the empty form, then it accepts all instances. An empty schema
+will never produce any errors.
 
-If a schema is of the "ref" form, then it accepts an instance if and only if the
-schema which the `ref` member resolves to accepts the instance. The standard
-errors to produce are the same as those that the referent schema produces. The
-resolution of a `ref` member is described in {{ref-resolution}}.
+### Ref
 
-For example, if we evaluate the instance:
+The ref form is for when a schema is meant to be defined in terms of something
+in the `definitions` of the root schema. The ref form enables schemas to be less
+repetitive, and also enables describing recursive structures.
 
-~~~ json
-"example"
-~~~
+If a schema is of the ref form, then:
 
-Against the schema:
+- Let *B* be the root schema containing the schema.
+- Let *D* be the member of *B* with the name `definitions`. By {{syntax}}, *D*
+  exists.
+- Let *R* be the value of the schema member with the name `ref`.
+- Let *S* be the value of the member of *D* whose name equals *R*. By
+  {{syntax}}, *S* exists, and is a schema.
+
+The schema accepts the instance if and only if *S* accepts the instance.
+Otherwise, the standard errors to return in this case are the union of the
+errors from evaluating *S* against the instance.
+
+For example, the schema:
 
 ~~~ json
 {
-  "ref": "http://example.com"
+  "definitions": { "a": { "type": "number" }},
+  "ref": "a"
 }
 ~~~
 
-Within an evaluating context containing the schema:
+Accepts 123 but not false. The standard errors to produce when evaluting false
+against this schema are:
+
+~~~ json
+[{ "instancePath": "", "schemaPath": "/definitions/a/type" }]
+~~~
+
+Note that the ref form is defined to only look up definitions at the root level.
+Thus, with the schema:
 
 ~~~ json
 {
-  "id": "http://example.com",
-  "type": "number"
-}
-~~~
-
-Then the standard errors are:
-
-~~~ json
-[
-  {
-    "instancePath": "",
-    "schemaPath": "/type",
-    "schemaURI": "http://example.com"
+  "definitions": { "a": { "type": "number" }},
+  "elements": {
+    "definitions": { "a": { "type": "boolean" }},
+    "ref": "foo"
   }
-]
+}
 ~~~
 
-See {{eval-type-form}} for how the `type` member produces errors, as the errors
-in the example above compose upon `type` errors.
+The instance 123 is accepted, and false is rejected. The standard errors to
+produce when evaluating false against this schema are:
 
-### Type form {#eval-type-form}
+~~~ json
+[{ "instancePath": "", "schemaPath": "/definitions/a/type" }]
+~~~
 
-The "type" form is meant to describe the primitive data types of JSON.
+Though non-root definitions are not syntactically disallowed in correct schemas,
+they are entirely immaterial to evaluating references.
 
-If a schema is of the "type" form, then:
+### Type
 
-- If the value of the `type` member is `null`, then the instance is accepted if
-  it equals `null`.
-- If the value of the `type` member is `boolean`, then the instance is accepted
-  if it equals `true` or `false`.
-- If the value of the `type` member is `number`, then the instance is accepted
-  if it is a JSON number.
-- If the value of the `type` member is `string`, then the instance is accepted
-  if it is a JSON string.
+The type form is meant to describe instances whose value is a boolean, number,
+string, or timestamp ({{RFC3339}}).
+
+If a schema is of the type form, then let *T* be the value of the member with
+the name `type`:
+
+- If *T* equals `boolean`, then the instance is accepted if it equals `true` or
+  `false`.
+- If *T* equals `number`, then the instance is accepted if it is a JSON number.
+- If *T* equals `string`, then the instance is accepted if it is a JSON string.
+- If *T* equals `timestamp`, then the instance is accepted if it is a JSON
+  string encoding a timestamp, as defined by {{RFC3339}}.
 
 If the instance is not accepted, then the standard error for this case shall
 have an `instancePath` pointing to the instance, and a `schemaPath` pointing to
-the `type` member.
+the schema member with the name `type`.
 
-For example, if we evaluate the instance:
+For example:
 
-~~~ json
-"example"
-~~~
+- The schema {"type": "boolean"} accepts false, but rejects 123.
+- The schema {"type": "number"} accepts 123, but rejects false.
+- The schema {"type": "string"} accepts "1985-04-12T23:20:50.52Z" and "foo", but
+  rejects 123.
+- The schema {"type": "timestamp"} accepts "1985-04-12T23:20:50.52Z", but
+  rejects "foo" and 123.
 
-Against the schema:
-
-~~~ json
-{ "type": "number" }
-~~~
-
-Then the standard errors are:
+To give an example of standardized errors, the standard errors to produce when
+{"type": "boolean"} is evaluated against 123 is:
 
 ~~~ json
 [{ "instancePath": "", "schemaPath": "/type" }]
 ~~~
 
-### Elements form
+### Enum
 
-The "elements" form is meant to describe JSON arrays representing homogeneous
-data. When a schema is of the "elements" form, it validates:
+The enum form is meant to describe instances whose value must be one of a
+finite, predetermined set of string values.
 
-- That the instance is an array, and
-- That all of the elements of the array are of the same type.
+If a schema is of the enum form, then let *E* be the value of the schema member
+with the name `enum`. The instance is accepted if and only if it is equal to one
+of the elements of *E*.
 
-If a schema is of the "elements" form, then:
+If the instance is not accepted, then the standard error for this case shall
+have an `instancePath` pointing to the instance, and a `schemaPath` pointing to
+the schema member with the name `enum`.
 
-1. If the instance is not a JSON array, then the instance is rejected. The
-   standard error shall have an `instancePath` pointing to the instance, and a
-   `schemaPath` pointing to the `elements` member.
-2. Otherwise, the instance is accepted if each element of the instance is
-   accepted by the value of the `elements` member. The standard error shall be
-   the concatenation of the standard errors from evaluating each element of the
-   instance against the value of the `elements` member.
+For example, the schema:
+
+~~~ json
+{ "enum": ["PENDING", "DONE", "CANCELED"] }
+~~~
+
+Accepts "PENDING", "DONE", and "CANCELED", but it rejects both 123 and "UNKNOWN"
+with the standard errors:
+
+~~~ json
+[{ "instancePath": "", "schemaPath": "/enum" }]
+~~~
+
+### Elements
+
+The elements form is meant to describe instances instances that must be arrays.
+A further sub-schema describes the elements of the array.
+
+If a schema is of the elements form, then let *S* be the value of the schema
+member with the name `elements`. The instance is accepted if and only if all of
+the following are true:
+
+- The instance is an array. Otherwise, the standard error for this case shall
+  have an `instancePath` pointing to the instance, and a `schemaPath` pointing
+  to the schema member with the name `elements`.
+
+- If the instance is an array, then every element of the instance must be
+  accepted by *S*. Otherwise, the standard errors for this case are the union of
+  all the errors arising from evaluating *S* against elements of the instance.
 
 For example, if we have the schema:
 
@@ -443,19 +585,14 @@ For example, if we have the schema:
 }
 ~~~
 
-Then if we evaluate the instance:
-
-~~~ json
-"example"
-~~~
-
-Against this schema, the standard errors are:
+Then the instances \[\] and \[1, 2, 3\] are accpeted. If instead we evaluate
+false against that schema, the standard errors are:
 
 ~~~ json
 [{ "instancePath": "", "schemaPath": "/elements" }]
 ~~~
 
-If instead we evaluate the instance:
+Finally, if we evaluate the instance:
 
 ~~~ json
 [1, 2, "foo", 3, "bar"]
@@ -470,57 +607,53 @@ The standard errors are:
 ]
 ~~~
 
-### Properties form {#eval-props-form}
+### Properties {#semantics-form-props}
 
-The "properties" form is meant to describe JSON objects being used in a fashion
-similar to structs in C-like languages. When a schema is of the "properties"
-form, it validates:
+The properties form is meant to describe JSON objects being used as a "struct".
 
-- That the instance is an object,
-- That the instance has a set of required properties, each satisfying their own
-  respective schema, and
-- That the instance may have a set of optional properties that, if present in
-  the instance, satisfy their own respective schema.
+If a schema is of the properties form, then the instance is accepted if and only
+if all of the following are true:
 
-If a schema is of the "properties" form, then:
+- The instance is an object.
 
-1. If the instance is not a JSON object, then the instance is rejected.
+  Otherwise, the standard error for this case shall have an `instancePath`
+  pointing to the instance, and a `schemaPath` pointing to the schema member
+  with the name `properties` if such a schema member exists; if such a member
+  doesn't exist, `schemaPath` shall point to the schema member with the name
+  `optionalProperties`.
 
-   The standard error for this case has an `instancePath` pointing to the
-   instance. If the schema has a `properties` member, then the `schemaPath` of
-   the error shall point to the `properties` member. Otherwise, `schemaPath`
-   shall point to the `optionalProperties` member.
+- If the instance is an object and the schema has a member named `properties`,
+  then let *P* be the value of the schema member named `properties`. *P*, by
+  {{syntax}}, must be an object. For every member name in *P*, a member of the
+  same name in the instance must exist.
 
-2. If the instance is a JSON object, and the schema has a `properties` member,
-   then for each member name of the `properties` of the schema, a member of the
-   same name must appear in the instance. Otherwise, the instance is rejected.
+  Otherwise, the standard error for this case shall have an `instancePath`
+  pointing to the instance, and a `schemaPath` pointing to the member of *P*
+  failing the requirement just described.
 
-   The standard error for this case has an `instancePath` pointing to the
-   instance, and a `schemaPath` pointing to the member of `properties` whose
-   name lacks a counterpart in the instance.
+- If the instance is an object, then let *P* be the value of the schema member
+  named `properties` (if it exists), and *O* be the value of the schema member
+  named `optionalProperties` (if it exists).
 
-3. If the instance is a JSON object, then for each member of the instance, find
-   a member of the same name in the `properties` or `optionalProperties` of the
-   schema.
+  For every member *I* of the instance, find a member with the same name as
+  *I*'s in *P* or *O*. By {{syntax}}, it is not possible for both *P* and *O* to
+  have such a member. If the "discriminator tag exemption" is in effect on *I*
+  (see {{semantics-form-discriminator}}), then ignore *I*. Otherwise:
 
-   - If no such member in the `properties` or `optionalProperties` exists, and
-     validation is using strict instance semantics, then the instance is
-     rejected.
+  - If no such member in *P* or *O* exists and validation is using strict
+    instance semantics, then the instance is rejected.
 
-     The standard error for this case has an `instancePath` pointing to the
-     member of the instance lacking a counterpart in the schema, and a
-     `schemaPath` pointing to the schema.
+    The standard error for this case has an `instancePath` pointing *I*, and a
+    `schemaPath` pointing to the schema.
 
-   - If such a member in the `properties` or `optionalProperties` does exist,
-     then the value of the member from the instance must be accepted by the
-     value of the corresponding member from the schema. Otherwise, the instance
-     is rejected.
+  - If such a member in *P* or *O* does exist, then call this member *S*. If *S*
+    rejects *I*'s value, then the instance is rejected.
 
-     The standard error for this case is the concatenation of the errors from
-     evaluating the member of the instance against the member of the schema.
+    The standard error for this case is the union of the errors from evaluating
+    *S* against *I*'s value.
 
-An instance may have errors arising from both (2) and (3). In this case, the
-standard errors should be concatenated together.
+An instance may have multiple errors arising from the second and third bullet in
+the above. In this case, the standard errors are the union of the errors.
 
 For example, if we have the schema:
 
@@ -537,13 +670,17 @@ For example, if we have the schema:
 }
 ~~~
 
-Then if we evaluate the instance:
+Then each of the following instances (one on each line) are accepted:
 
 ~~~ json
-"example"
+{ "a": "foo", "b": "bar" }
+{ "a": "foo", "b": "bar", "c": "baz" }
+{ "a": "foo", "b": "bar", "c": "baz", "d": "quux" }
+{ "a": "foo", "b": "bar", "d": "quux" }
 ~~~
 
-Against this schema, then the standard errors are:
+If we evaluate the instance 123 against this schema, then the standard errors
+are:
 
 ~~~ json
 [{ "instancePath": "", "schemaPath": "/properties" }]
@@ -573,25 +710,23 @@ The standard errors, using strict instance semantics, are:
 If we the same instance were evaluated, but without strict instance semantics,
 the final element of the above array of errors would not be present.
 
-### Values form
+### Values
 
-The "values" form is meant to describe JSON objects being used as an associative
-array mapping arbitrary strings to values all of the same type. When a schema is
-of the "properties" form, it validates:
+The elements form is meant to describe instances that are JSON objects being
+used as an associative array.
 
-- That the instance is an object, and
-- That the values of the instance all satisfy the same schema.
+If a schema is of the values form, then let *S* be the value of the schema
+member with the name `values`. The instance is accepted if and only if all of
+the following are true:
 
-If a schema is of the "values" form, then:
+- The instance is an object. Otherwise, the standard error for this case shall
+  have an `instancePath` pointing to the instance, and a `schemaPath` pointing
+  to the schema member with the name `values`.
 
-1. If the instance is not a JSON object, then the instance is rejected. The
-   standard error shall have an `instancePath` pointing to the instance, and a
-   `schemaPath` pointing to the `values` member.
-
-2. Otherwise, the instance is accepted if the value of each member of the
-   instance is accepted by the value of the `values` member. The standard error
-   shall be the concatenation of the standard errors from evaluating the value
-   of each member of the instance against the value of the `values` member.
+- If the instance is an object, then every member value of the instance must be
+  accepted by *S*. Otherwise, the standard errors for this case are the union of
+  all the errors arising from evaluating *S* against member values of the
+  instance.
 
 For example, if we have the schema:
 
@@ -603,19 +738,14 @@ For example, if we have the schema:
 }
 ~~~
 
-Then if we evaluate the instance:
-
-~~~ json
-"example"
-~~~
-
-Against this schema, the standard errors are:
+Then the instances {} and {"a": 1, "b": 2} are accpeted. If instead we evaluate
+false against that schema, the standard errors are:
 
 ~~~ json
 [{ "instancePath": "", "schemaPath": "/values" }]
 ~~~
 
-If instead we evaluate the instance:
+Finally, if we evaluate the instance:
 
 ~~~ json
 { "a": 1, "b": 2, "c": "foo", "d": 3, "e": "bar" }
@@ -630,59 +760,70 @@ The standard errors are:
 ]
 ~~~
 
-### Discriminator form
+### Discriminator {#semantics-form-discriminator}
 
-The "discriminator" form is meant to describe JSON objects being used in a
-fashion similar to a discriminated union construct in C-like languages. When a
-schema is of the "disciminator" type, it validates:
+The discriminator form is meant to describe JSON objects being used in a fashion
+similar to a discriminated union construct in C-like languages. When a schema is
+of the "discriminator" form, it validates:
 
 - That the instance is an object,
-- That the instance has a particular "disciminator" property,
-- That this "discriminator" value is a string within a set of valid values, and
+- That the instance has a particular "tag" property,
+- That this "tag" property's value is a string within a set of valid values, and
 - That the instance satisfies another schema, where this other schema is chosen
-  based on the value of the "discriminator" property.
+  based on the value of the "tag" property.
 
-If a schema is of the "disciminator" form, then:
+The behavior of the discriminator form is more complex than the other keywords.
+Readers familiar with CDDL may find the final example in
+{{comparison-with-cddl}} helpful in understanding its behavior. What follows
+here is an English description of the discriminator form's behavior, as well as
+some examples.
 
-1. If the instance is not a JSON object, then the instance is rejected. The
-   standard error shall have an `instancePath` pointing to the instance, and a
-   `schemaPath` pointing to the `discriminator` member.
+If a schema is of the "discriminator" form, then:
 
-2. If the instance is a JSON object and lacks a member whose name equals the
-   `tag` value of the `discriminator` of the schema, then the instance is
-   rejected.
+- Let *D* be the schema member with the name `discriminator`.
+- Let *T* be the member of *D* with the name `tag`.
+- Let *M* be the member of *D* with the name `mapping`.
+- Let *I* be the instance member whose name equals *T*'s value. *I* may, for
+  some rejected instances, not exist.
+- Let *S* be the member of *M* whose name equals *I*'s value. *S* may, for some
+  rejected instances, not exist.
 
-   The standard error to produce in this case has an `instancePath` pointing to
-   the instance, and a `schemaPath` pointing to the `tag` member of the
-   `disciminator` member of the schema.
+The instance is accepted if and only if:
 
-3. If the instance is a JSON object and has a member whose name equals the `tag`
-   value of the `discriminator` of the schema, but that member's value is not a
-   string, then the instance is rejected.
+- The instance is an object.
 
-   The standard error to produce in this case has an `instancePath` pointing to
-   the member of the instance corresponding to `tag`, and a `schemaPath`
-   pointing to the `tag` member of the discriminator.
+  Otherwise, the standard error for this case shall have an `instancePath`
+  pointing to the instance, and a `schemaPath` pointing to *D*.
 
-4. If the instance is a JSON object and has a member whose name equals the `tag`
-   value of the `discriminator` of the schema and whose value is a string, but
-   that member's value is not equal to any of the member names in the `mapping`
-   of the `discriminator`, then the instance is rejected.
+- If the instance is a JSON object, then *I* must exist.
 
-   The standard error to produce in this case has an `instancePath` pointing to
-   the member of the instance corresponding to `tag`, and a `schemaPath`
-   pointing to the `mapping` member of the `discriminator` member of the schema.
+  Otherwise, the standard error for this case shall have an `instancePath`
+  pointing to the instance, and a `schemaPath` pointing to *T*.
 
-5. If the instance is a JSON object and has a member whose name equals the `tag`
-   value of the `discriminator` of the schema, and that member's value is equal
-   to one of the member names in the `mapping` of the `discriminator`, then the
-   instance must satisfy this corresponding schema in `mapping`. Otherwise, the
-   instance is rejected.
+- If the instance is a JSON object and *I* exists, *I*'s value must be a string.
 
-   The standard errors to produce in this case are those produced by evaluating
-   the instance against the schema within the `mapping`.
+  Otherwise, the standard error for this case shall have an `instancePath`
+  pointing to *I*, and a `schemaPath` pointing to *T*.
 
-For example, if we have the schema:
+- If the instance is a JSON object and *I* exists and has a string value, then
+  *S* must exist.
+
+  Otherwise, the standard error for this case shall have an `instancePath`
+  pointing to *I*, and a `schemaPath` pointing to *M*.
+
+- If the instance is a JSON object, *I* exists, and *S* exists, then the
+  instance must satisfy *S*'s value. By {{syntax}}, *S*'s value must have the
+  properties form. Apply the "discriminator tag exemption" afforded in
+  {{semantics-form-props}} to *I* when evaluating whether the instance satisfies
+  *S*'s value.
+
+  Otherwise, the standard errors for this case shall be standard errors from
+  evaluating *S*'s value against the instance.
+
+Each of the list items above are defined to be mutually exclusive. For the same
+instance and schema, only one of the list items above will apply.
+
+To illustrate the discriminator form, if we have the schema:
 
 ~~~ json
 {
@@ -716,6 +857,8 @@ Against this schema, the standard errors are:
 [{ "instancePath": "", "schemaPath": "/discriminator" }]
 ~~~
 
+(This is the case of the instance not being an object.)
+
 If we instead evaluate the instance:
 
 ~~~ json
@@ -727,6 +870,8 @@ Then the standard errors are:
 ~~~ json
 [{ "instancePath": "", "schemaPath": "/discriminator/tag" }]
 ~~~
+
+(This is the case of *I* not existing.)
 
 If we instead evaluate the instance:
 
@@ -740,12 +885,12 @@ Then the standard errors are:
 [{ "instancePath": "/version", "schemaPath": "/discriminator/tag" }]
 ~~~
 
+(This is the case of *I* existing, but having a string value.)
+
 If we instead evaluate the instance:
 
 ~~~ json
-{
-  "version": "v3"
-}
+{ "version": "v3" }
 ~~~
 
 Then the standard errors are:
@@ -757,13 +902,13 @@ Then the standard errors are:
 ]
 ~~~
 
-Finally, if the instance evaluated were:
+(This is the case of *I* existing and having a string value, but *S* not
+existing.)
+
+If the instance evaluated were:
 
 ~~~ json
-{
-  "version": "v2",
-  "a": 3
-}
+{ "version": "v2", "a": 3 }
 ~~~
 
 Then the standard errors are:
@@ -777,6 +922,20 @@ Then the standard errors are:
 ]
 ~~~
 
+(This is the case of *I* and *S* existing, but the instance not satisfying *S*'s
+value.)
+
+Finally, if instead the instance were:
+
+~~~ json
+{ "version": "v2", "a": "foo" }
+~~~
+
+Then the instance satisfies the schema. No standard errors are returned. This
+would be the case even if evaluation were using strict instance semantics, as
+the "discriminator tag exemption" would ensure that `version` is not treated as
+an unexpected property when evaluating the instance against *S*'s value.
+
 # IANA Considerations
 
 No IANA considerations.
@@ -787,23 +946,166 @@ Implementations of JSON Schema Language will necessarily be manipulating JSON
 data. Therefore, the security considerations of {{RFC8259}} are all relevant
 here.
 
-Implementations which evaluate user-inputted schemas **SHOULD** implement
-mechanisms to detect, and abort, circular references which might cause a naive
+Implementations which evaluate user-inputted schemas SHOULD implement mechanisms
+to detect, and abort, circular references which might cause a naive
 implementation to go into an infinite loop. Without such mechanisms,
 implementations may be vulnerable to denial-of-service attacks.
 
-Implementations of JSON Schema Language **SHOULD NOT** naively attempt to fetch
-and evaluate schemas when they are referred to using the `ref` keyword. Doing so
-could lead to denial of service. Instead, implementations should only fetch
-schemas through secure channels, and should only fetch and evaluate schemas from
-trusted sources.
-
 --- back
 
+# Comparison with CDDL {#comparison-with-cddl}
+
+This appendix is informative.
+
+To aid the reader familiar with CDDL, this section illustrates how JSL works by
+presenting JSL schemas and CDDL schemas which accept and reject the same
+instances.
+
+The JSL schema {} accepts the same instances as the CDDL rule:
+
+~~~ cddl
+root = any
+~~~
+
+The JSL schema:
+
+~~~ json
+{
+  "definitions": {
+    "a": { "elements": { "ref": "b" }},
+    "b": { "type": "number" }
+  },
+  "elements": {
+    "ref": "a"
+  }
+}
+~~~
+
+Corresponds to the CDDL schema:
+
+~~~ cddl
+root = [* a]
+
+a = [* b]
+b = number
+~~~
+
+The JSL schema:
+
+~~~ json
+{ "enum": ["PENDING", "DONE", "CANCELED"]}
+~~~
+
+Accepts the same instances as the CDDL rule:
+
+~~~ cddl
+root = "PENDING" / "DONE" / "CANCELED"
+~~~
+
+The JSL schema {"type": "boolean"} corresponds to the CDDL rule:
+
+~~~ cddl
+root = bool
+~~~
+
+The JSL schema {"type": "number"} corresponds to the CDDL rule:
+
+~~~ cddl
+root = number
+~~~
+
+The JSL schema {"type": "string"} corresponds to the CDDL rule:
+
+~~~ cddl
+root = tstr
+~~~
+
+The JSL schema {"type": "timestamp"} corresponds to the CDDL rule:
+
+~~~ cddl
+root = tdate
+~~~
+
+The JSL schema:
+
+~~~ json
+{ "elements": { "type": "number" }}
+~~~
+
+Corresponds to the CDDL rule:
+
+~~~ cddl
+root = [* number]
+~~~
+
+The JSL schema:
+
+~~~ json
+{
+  "properties": {
+    "a": { "type": "boolean" },
+    "b": { "type": "number" }
+  },
+  "optionalProperties": {
+    "c": { "type": "string" },
+    "d": { "type": "timestamp" }
+  }
+}
+~~~
+
+Corresponds to the CDDL rule:
+
+~~~ cddl
+root = { a: bool, b: number, ? c: tstr, ? d: tdate }
+~~~
+
+The JSL schema:
+
+~~~ json
+{ "values": { "type": "number" }}
+~~~
+
+Corresponds to the CDDL rule:
+
+~~~ cddl
+root = { * tstr => number }
+~~~
+
+Finally, the JSL schema:
+
+~~~ json
+{
+  "discriminator": {
+    "tag": "a",
+    "mapping": {
+      "foo": {
+        "properties": {
+          "b": { "type": "number" }
+        }
+      },
+      "bar": {
+        "properties": {
+          "b": { "type": "string" }
+        }
+      }
+    }
+  }
+}
+~~~
+
+Corresponds to the CDDL rule:
+
+~~~ cddl
+root = { a: "foo", b: number } / { a: "bar", b: tstr }
+~~~
+
 # Acknowledgments
+{: numbered="no"}
 
 Thanks to Gary Court, Francis Galiegue, Kris Zyp, Geraint Luff, Jason
 Desrosiers, Daniel Perrett, Erik Wilde, Ben Hutton, Evgeny Poberezkin, Brad
 Bowman, Gowry Sankar, Donald Pipowitch, Dave Finlay, Denis Laxalde, Henry
 Andrews, and Austin Wright for their work on the initial drafts of JSON Schema,
 which inspired JSON Schema Language.
+
+Thanks to Tim Bray and Carsten Bormann for their help on JSON Schema Language.
