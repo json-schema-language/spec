@@ -1,7 +1,7 @@
 ---
 title: JSON Schema Language
 docname: draft-json-schema-language-01
-date: 2019-05-31
+date: 2019-06-06
 ipr: trust200902
 area: Applications
 wg: JSON Working Group
