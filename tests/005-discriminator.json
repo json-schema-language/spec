@@ -160,7 +160,7 @@
             "properties": {
               "values": {
                 "elements": {
-                  "type": "strings"
+                  "type": "string"
                 }
               }
             }
