@@ -341,7 +341,7 @@
       },
       {
         "instance": {
-          "foo": null,
+          "foo": "",
           "bar": true,
           "baz": 123
         },
@@ -405,7 +405,7 @@
         "errors": [
           {
             "instancePath": "/baz",
-            "schemaPath": "/properties"
+            "schemaPath": ""
           }
         ]
       },
