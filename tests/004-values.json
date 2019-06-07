@@ -1,10 +1,9 @@
 [
   {
-    "name": "values must be null",
-    "registry": [],
+    "name": "values must be string",
     "schema": {
       "values": {
-        "type": "null"
+        "type": "string"
       }
     },
     "strictInstance": true,
@@ -14,8 +13,7 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/values",
-            "schemaURI": ""
+            "schemaPath": "/values"
           }
         ]
       },
@@ -25,25 +23,23 @@
       },
       {
         "instance": {
-          "foo": null
+          "foo": ""
         },
         "errors": []
       },
       {
         "instance": {
-          "foo": "foo",
-          "bar": "bar"
+          "foo": null,
+          "bar": null
         },
         "errors": [
           {
             "instancePath": "/foo",
-            "schemaPath": "/values/type",
-            "schemaURI": ""
+            "schemaPath": "/values/type"
           },
           {
             "instancePath": "/bar",
-            "schemaPath": "/values/type",
-            "schemaURI": ""
+            "schemaPath": "/values/type"
           }
         ]
       }

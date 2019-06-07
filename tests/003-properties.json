@@ -1,11 +1,10 @@
 [
   {
     "name": "strict properties",
-    "registry": [],
     "schema": {
       "properties": {
         "foo": {
-          "type": "null"
+          "type": "string"
         },
         "bar": {
           "type": "boolean"
@@ -19,8 +18,7 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/properties",
-            "schemaURI": ""
+            "schemaPath": "/properties"
           }
         ]
       },
@@ -29,77 +27,70 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/properties/foo",
-            "schemaURI": ""
+            "schemaPath": "/properties/foo"
           },
           {
             "instancePath": "",
-            "schemaPath": "/properties/bar",
-            "schemaURI": ""
+            "schemaPath": "/properties/bar"
           }
         ]
       },
       {
         "instance": {
-          "foo": null
+          "foo": ""
         },
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/properties/bar",
-            "schemaURI": ""
+            "schemaPath": "/properties/bar"
           }
         ]
       },
       {
         "instance": {
-          "foo": null,
+          "foo": "",
           "bar": true
         },
         "errors": []
       },
       {
         "instance": {
-          "foo": null,
+          "foo": "",
           "bar": true,
           "baz": 123
         },
         "errors": [
           {
             "instancePath": "/baz",
-            "schemaPath": "",
-            "schemaURI": ""
+            "schemaPath": ""
           }
         ]
       },
       {
         "instance": {
-          "foo": "foo",
+          "foo": null,
           "bar": true
         },
         "errors": [
           {
             "instancePath": "/foo",
-            "schemaPath": "/properties/foo/type",
-            "schemaURI": ""
+            "schemaPath": "/properties/foo/type"
           }
         ]
       },
       {
         "instance": {
-          "foo": "foo",
+          "foo": null,
           "bar": "bar"
         },
         "errors": [
           {
             "instancePath": "/bar",
-            "schemaPath": "/properties/bar/type",
-            "schemaURI": ""
+            "schemaPath": "/properties/bar/type"
           },
           {
             "instancePath": "/foo",
-            "schemaPath": "/properties/foo/type",
-            "schemaURI": ""
+            "schemaPath": "/properties/foo/type"
           }
         ]
       }
@@ -107,11 +98,10 @@
   },
   {
     "name": "non-strict properties",
-    "registry": [],
     "schema": {
       "properties": {
         "foo": {
-          "type": "null"
+          "type": "string"
         },
         "bar": {
           "type": "boolean"
@@ -125,8 +115,7 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/properties",
-            "schemaURI": ""
+            "schemaPath": "/properties"
           }
         ]
       },
@@ -135,38 +124,35 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/properties/foo",
-            "schemaURI": ""
+            "schemaPath": "/properties/foo"
           },
           {
             "instancePath": "",
-            "schemaPath": "/properties/bar",
-            "schemaURI": ""
+            "schemaPath": "/properties/bar"
           }
         ]
       },
       {
         "instance": {
-          "foo": null
+          "foo": ""
         },
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/properties/bar",
-            "schemaURI": ""
+            "schemaPath": "/properties/bar"
           }
         ]
       },
       {
         "instance": {
-          "foo": null,
+          "foo": "",
           "bar": true
         },
         "errors": []
       },
       {
         "instance": {
-          "foo": null,
+          "foo": "",
           "bar": true,
           "baz": 123
         },
@@ -174,32 +160,29 @@
       },
       {
         "instance": {
-          "foo": "foo",
+          "foo": null,
           "bar": true
         },
         "errors": [
           {
             "instancePath": "/foo",
-            "schemaPath": "/properties/foo/type",
-            "schemaURI": ""
+            "schemaPath": "/properties/foo/type"
           }
         ]
       },
       {
         "instance": {
-          "foo": "foo",
+          "foo": null,
           "bar": "bar"
         },
         "errors": [
           {
             "instancePath": "/bar",
-            "schemaPath": "/properties/bar/type",
-            "schemaURI": ""
+            "schemaPath": "/properties/bar/type"
           },
           {
             "instancePath": "/foo",
-            "schemaPath": "/properties/foo/type",
-            "schemaURI": ""
+            "schemaPath": "/properties/foo/type"
           }
         ]
       }
@@ -207,11 +190,10 @@
   },
   {
     "name": "strict optionalProperties",
-    "registry": [],
     "schema": {
       "optionalProperties": {
         "foo": {
-          "type": "null"
+          "type": "string"
         },
         "bar": {
           "type": "boolean"
@@ -225,8 +207,7 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/optionalProperties",
-            "schemaURI": ""
+            "schemaPath": "/optionalProperties"
           }
         ]
       },
@@ -236,7 +217,14 @@
       },
       {
         "instance": {
-          "foo": null
+          "foo": ""
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "foo": "",
+          "bar": true
         },
         "errors": []
       },
@@ -245,50 +233,39 @@
           "foo": null,
           "bar": true
         },
-        "errors": []
-      },
-      {
-        "instance": {
-          "foo": "foo",
-          "bar": true
-        },
         "errors": [
           {
             "instancePath": "/foo",
-            "schemaPath": "/optionalProperties/foo/type",
-            "schemaURI": ""
+            "schemaPath": "/optionalProperties/foo/type"
           }
         ]
       },
       {
         "instance": {
-          "foo": "foo",
+          "foo": null,
           "bar": "bar"
         },
         "errors": [
           {
             "instancePath": "/bar",
-            "schemaPath": "/optionalProperties/bar/type",
-            "schemaURI": ""
+            "schemaPath": "/optionalProperties/bar/type"
           },
           {
             "instancePath": "/foo",
-            "schemaPath": "/optionalProperties/foo/type",
-            "schemaURI": ""
+            "schemaPath": "/optionalProperties/foo/type"
           }
         ]
       },
       {
         "instance": {
-          "foo": null,
+          "foo": "",
           "bar": true,
           "baz": 123
         },
         "errors": [
           {
             "instancePath": "/baz",
-            "schemaPath": "",
-            "schemaURI": ""
+            "schemaPath": ""
           }
         ]
       }
@@ -296,11 +273,10 @@
   },
   {
     "name": "non-strict optionalProperties",
-    "registry": [],
     "schema": {
       "optionalProperties": {
         "foo": {
-          "type": "null"
+          "type": "string"
         },
         "bar": {
           "type": "boolean"
@@ -314,8 +290,7 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/optionalProperties",
-            "schemaURI": ""
+            "schemaPath": "/optionalProperties"
           }
         ]
       },
@@ -325,7 +300,14 @@
       },
       {
         "instance": {
-          "foo": null
+          "foo": ""
+        },
+        "errors": []
+      },
+      {
+        "instance": {
+          "foo": "",
+          "bar": true
         },
         "errors": []
       },
@@ -334,36 +316,26 @@
           "foo": null,
           "bar": true
         },
-        "errors": []
-      },
-      {
-        "instance": {
-          "foo": "foo",
-          "bar": true
-        },
         "errors": [
           {
             "instancePath": "/foo",
-            "schemaPath": "/optionalProperties/foo/type",
-            "schemaURI": ""
+            "schemaPath": "/optionalProperties/foo/type"
           }
         ]
       },
       {
         "instance": {
-          "foo": "foo",
+          "foo": null,
           "bar": "bar"
         },
         "errors": [
           {
             "instancePath": "/bar",
-            "schemaPath": "/optionalProperties/bar/type",
-            "schemaURI": ""
+            "schemaPath": "/optionalProperties/bar/type"
           },
           {
             "instancePath": "/foo",
-            "schemaPath": "/optionalProperties/foo/type",
-            "schemaURI": ""
+            "schemaPath": "/optionalProperties/foo/type"
           }
         ]
       },
@@ -379,11 +351,10 @@
   },
   {
     "name": "strict mixed properties and optionalProperties",
-    "registry": [],
     "schema": {
       "properties": {
         "foo": {
-          "type": "null"
+          "type": "string"
         }
       },
       "optionalProperties": {
@@ -399,8 +370,7 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/properties",
-            "schemaURI": ""
+            "schemaPath": "/properties"
           }
         ]
       },
@@ -409,66 +379,61 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/properties/foo",
-            "schemaURI": ""
+            "schemaPath": "/properties/foo"
           }
         ]
       },
       {
         "instance": {
-          "foo": null
+          "foo": ""
         },
         "errors": []
       },
       {
         "instance": {
-          "foo": null,
+          "foo": "",
           "bar": true
         },
         "errors": []
       },
       {
         "instance": {
-          "foo": null,
+          "foo": "",
           "bar": true,
           "baz": 123
         },
         "errors": [
           {
             "instancePath": "/baz",
-            "schemaPath": "/properties",
-            "schemaURI": ""
+            "schemaPath": "/properties"
           }
         ]
       },
       {
         "instance": {
-          "foo": "foo",
+          "foo": null,
           "bar": true
         },
         "errors": [
           {
             "instancePath": "/foo",
-            "schemaPath": "/properties/foo/type",
-            "schemaURI": ""
+            "schemaPath": "/properties/foo/type"
           }
         ]
       },
       {
         "instance": {
-          "foo": "foo",
+          "foo": null,
           "bar": "bar"
         },
         "errors": [
           {
             "instancePath": "/bar",
-            "schemaPath": "/optionalProperties/bar/type",
-            "schemaURI": ""
+            "schemaPath": "/optionalProperties/bar/type"
           },
           {
             "instancePath": "/foo",
-            "schemaPath": "/properties/foo/type",
-            "schemaURI": ""
+            "schemaPath": "/properties/foo/type"
           }
         ]
       }
@@ -476,11 +441,10 @@
   },
   {
     "name": "non-strict mixed properties and optionalProperties",
-    "registry": [],
     "schema": {
       "properties": {
         "foo": {
-          "type": "null"
+          "type": "string"
         }
       },
       "optionalProperties": {
@@ -496,8 +460,7 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/properties",
-            "schemaURI": ""
+            "schemaPath": "/properties"
           }
         ]
       },
@@ -506,27 +469,26 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/properties/foo",
-            "schemaURI": ""
+            "schemaPath": "/properties/foo"
           }
         ]
       },
       {
         "instance": {
-          "foo": null
+          "foo": ""
         },
         "errors": []
       },
       {
         "instance": {
-          "foo": null,
+          "foo": "",
           "bar": true
         },
         "errors": []
       },
       {
         "instance": {
-          "foo": null,
+          "foo": "",
           "bar": true,
           "baz": 123
         },
@@ -534,32 +496,29 @@
       },
       {
         "instance": {
-          "foo": "foo",
+          "foo": null,
           "bar": true
         },
         "errors": [
           {
             "instancePath": "/foo",
-            "schemaPath": "/properties/foo/type",
-            "schemaURI": ""
+            "schemaPath": "/properties/foo/type"
           }
         ]
       },
       {
         "instance": {
-          "foo": "foo",
+          "foo": null,
           "bar": "bar"
         },
         "errors": [
           {
             "instancePath": "/bar",
-            "schemaPath": "/optionalProperties/bar/type",
-            "schemaURI": ""
+            "schemaPath": "/optionalProperties/bar/type"
           },
           {
             "instancePath": "/foo",
-            "schemaPath": "/properties/foo/type",
-            "schemaURI": ""
+            "schemaPath": "/properties/foo/type"
           }
         ]
       }

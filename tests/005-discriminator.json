@@ -1,16 +1,15 @@
 [
   {
     "name": "strict discriminator",
-    "registry": [],
     "schema": {
       "discriminator": {
         "tag": "arrayOf",
         "mapping": {
-          "nulls": {
+          "strings": {
             "properties": {
               "values": {
                 "elements": {
-                  "type": "null"
+                  "type": "string"
                 }
               }
             }
@@ -34,8 +33,7 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/discriminator",
-            "schemaURI": ""
+            "schemaPath": "/discriminator"
           }
         ]
       },
@@ -44,8 +42,7 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/discriminator/tag",
-            "schemaURI": ""
+            "schemaPath": "/discriminator/tag"
           }
         ]
       },
@@ -56,8 +53,7 @@
         "errors": [
           {
             "instancePath": "/arrayOf",
-            "schemaPath": "/discriminator/tag",
-            "schemaURI": ""
+            "schemaPath": "/discriminator/tag"
           }
         ]
       },
@@ -68,52 +64,47 @@
         "errors": [
           {
             "instancePath": "/arrayOf",
-            "schemaPath": "/discriminator/mapping",
-            "schemaURI": ""
+            "schemaPath": "/discriminator/mapping"
           }
         ]
       },
       {
         "instance": {
-          "arrayOf": "nulls",
-          "values": [null, null, null]
+          "arrayOf": "strings",
+          "values": ["", "", ""]
         },
         "errors": []
       },
       {
         "instance": {
-          "arrayOf": "nulls",
+          "arrayOf": "strings",
           "values": [true, true, true]
         },
         "errors": [
           {
             "instancePath": "/values/0",
-            "schemaPath": "/discriminator/mapping/nulls/properties/values/elements/type",
-            "schemaURI": ""
+            "schemaPath": "/discriminator/mapping/strings/properties/values/elements/type"
           },
           {
             "instancePath": "/values/1",
-            "schemaPath": "/discriminator/mapping/nulls/properties/values/elements/type",
-            "schemaURI": ""
+            "schemaPath": "/discriminator/mapping/strings/properties/values/elements/type"
           },
           {
             "instancePath": "/values/2",
-            "schemaPath": "/discriminator/mapping/nulls/properties/values/elements/type",
-            "schemaURI": ""
+            "schemaPath": "/discriminator/mapping/strings/properties/values/elements/type"
           }
         ]
       },
       {
         "instance": {
-          "arrayOf": "nulls",
-          "values": [null, null, null],
+          "arrayOf": "strings",
+          "values": ["", "", ""],
           "extra": null
         },
         "errors": [
           {
             "instancePath": "/extra",
-            "schemaPath": "/discriminator/mapping/nulls/properties",
-            "schemaURI": ""
+            "schemaPath": "/discriminator/mapping/strings/properties"
           }
         ]
       },
@@ -132,18 +123,15 @@
         "errors": [
           {
             "instancePath": "/values/0",
-            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type",
-            "schemaURI": ""
+            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type"
           },
           {
             "instancePath": "/values/1",
-            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type",
-            "schemaURI": ""
+            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type"
           },
           {
             "instancePath": "/values/2",
-            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type",
-            "schemaURI": ""
+            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type"
           }
         ]
       },
@@ -156,8 +144,7 @@
         "errors": [
           {
             "instancePath": "/extra",
-            "schemaPath": "/discriminator/mapping/booleans/properties",
-            "schemaURI": ""
+            "schemaPath": "/discriminator/mapping/booleans/properties"
           }
         ]
       }
@@ -165,16 +152,15 @@
   },
   {
     "name": "non-strict discriminator",
-    "registry": [],
     "schema": {
       "discriminator": {
         "tag": "arrayOf",
         "mapping": {
-          "nulls": {
+          "strings": {
             "properties": {
               "values": {
                 "elements": {
-                  "type": "null"
+                  "type": "strings"
                 }
               }
             }
@@ -198,8 +184,7 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/discriminator",
-            "schemaURI": ""
+            "schemaPath": "/discriminator"
           }
         ]
       },
@@ -208,8 +193,7 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/discriminator/tag",
-            "schemaURI": ""
+            "schemaPath": "/discriminator/tag"
           }
         ]
       },
@@ -220,8 +204,7 @@
         "errors": [
           {
             "instancePath": "/arrayOf",
-            "schemaPath": "/discriminator/tag",
-            "schemaURI": ""
+            "schemaPath": "/discriminator/tag"
           }
         ]
       },
@@ -232,51 +215,47 @@
         "errors": [
           {
             "instancePath": "/arrayOf",
-            "schemaPath": "/discriminator/mapping",
-            "schemaURI": ""
+            "schemaPath": "/discriminator/mapping"
           }
         ]
       },
       {
         "instance": {
-          "arrayOf": "nulls",
-          "values": [null, null, null]
+          "arrayOf": "strings",
+          "values": ["", "", ""]
         },
         "errors": []
       },
       {
         "instance": {
-          "arrayOf": "nulls",
-          "values": [null, null, null],
+          "arrayOf": "strings",
+          "values": [true, true, true]
+        },
+        "errors": [
+          {
+            "instancePath": "/values/0",
+            "schemaPath": "/discriminator/mapping/strings/properties/values/elements/type"
+          },
+          {
+            "instancePath": "/values/1",
+            "schemaPath": "/discriminator/mapping/strings/properties/values/elements/type"
+          },
+          {
+            "instancePath": "/values/2",
+            "schemaPath": "/discriminator/mapping/strings/properties/values/elements/type"
+          }
+        ]
+      },
+      {
+        "instance": {
+          "arrayOf": "strings",
+          "values": ["", "", ""],
           "extra": null
         },
         "errors": []
       },
       {
         "instance": {
-          "arrayOf": "nulls",
-          "values": [true, true, true]
-        },
-        "errors": [
-          {
-            "instancePath": "/values/0",
-            "schemaPath": "/discriminator/mapping/nulls/properties/values/elements/type",
-            "schemaURI": ""
-          },
-          {
-            "instancePath": "/values/1",
-            "schemaPath": "/discriminator/mapping/nulls/properties/values/elements/type",
-            "schemaURI": ""
-          },
-          {
-            "instancePath": "/values/2",
-            "schemaPath": "/discriminator/mapping/nulls/properties/values/elements/type",
-            "schemaURI": ""
-          }
-        ]
-      },
-      {
-        "instance": {
           "arrayOf": "booleans",
           "values": [true, true, true]
         },
@@ -290,18 +269,15 @@
         "errors": [
           {
             "instancePath": "/values/0",
-            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type",
-            "schemaURI": ""
+            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type"
           },
           {
             "instancePath": "/values/1",
-            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type",
-            "schemaURI": ""
+            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type"
           },
           {
             "instancePath": "/values/2",
-            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type",
-            "schemaURI": ""
+            "schemaPath": "/discriminator/mapping/booleans/properties/values/elements/type"
           }
         ]
       },

@@ -1,10 +1,9 @@
 [
   {
-    "name": "elements of type null",
-    "registry": [],
+    "name": "elements of type string",
     "schema": {
       "elements": {
-        "type": "null"
+        "type": "string"
       }
     },
     "strictInstance": true,
@@ -14,8 +13,7 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/elements",
-            "schemaURI": ""
+            "schemaPath": "/elements"
           }
         ]
       },
@@ -24,33 +22,30 @@
         "errors": []
       },
       {
-        "instance": [null, null, null],
+        "instance": ["", "", ""],
         "errors": []
       },
       {
-        "instance": [null, 3.14, "foo"],
+        "instance": ["", null, 3.14],
         "errors": [
           {
             "instancePath": "/1",
-            "schemaPath": "/elements/type",
-            "schemaURI": ""
+            "schemaPath": "/elements/type"
           },
           {
             "instancePath": "/2",
-            "schemaPath": "/elements/type",
-            "schemaURI": ""
+            "schemaPath": "/elements/type"
           }
         ]
       }
     ]
   },
   {
-    "name": "elements of elements of type null",
-    "registry": [],
+    "name": "elements of elements of type string",
     "schema": {
       "elements": {
         "elements": {
-          "type": "null"
+          "type": "string"
         }
       }
     },
@@ -61,8 +56,7 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/elements",
-            "schemaURI": ""
+            "schemaPath": "/elements"
           }
         ]
       },
@@ -75,31 +69,23 @@
         "errors": []
       },
       {
-        "instance": [
-          [null, null, null],
-          [null, 3.14, "foo"],
-          [null, 3.14, "foo"]
-        ],
+        "instance": [["", "", ""], ["", null, 3.14], ["", null, 3.14]],
         "errors": [
           {
             "instancePath": "/1/1",
-            "schemaPath": "/elements/elements/type",
-            "schemaURI": ""
+            "schemaPath": "/elements/elements/type"
           },
           {
             "instancePath": "/1/2",
-            "schemaPath": "/elements/elements/type",
-            "schemaURI": ""
+            "schemaPath": "/elements/elements/type"
           },
           {
             "instancePath": "/2/1",
-            "schemaPath": "/elements/elements/type",
-            "schemaURI": ""
+            "schemaPath": "/elements/elements/type"
           },
           {
             "instancePath": "/2/2",
-            "schemaPath": "/elements/elements/type",
-            "schemaURI": ""
+            "schemaPath": "/elements/elements/type"
           }
         ]
       }

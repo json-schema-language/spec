@@ -1,19 +1,18 @@
 [
   {
-    "name": "ref within same document",
-    "registry": [],
+    "name": "simple ref",
     "schema": {
       "definitions": {
         "a": {
-          "type": "null"
+          "type": "string"
         }
       },
-      "ref": "#a"
+      "ref": "a"
     },
     "strictInstance": true,
     "instances": [
       {
-        "instance": null,
+        "instance": "",
         "errors": []
       },
       {
@@ -21,31 +20,29 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/definitions/a/type",
-            "schemaURI": ""
+            "schemaPath": "/definitions/a/type"
           }
         ]
       }
     ]
   },
   {
-    "name": "nested refs within same document",
-    "registry": [],
+    "name": "nested refs",
     "schema": {
       "definitions": {
         "a": {
-          "ref": "#b"
+          "ref": "b"
         },
         "b": {
-          "type": "null"
+          "type": "string"
         }
       },
-      "ref": "#a"
+      "ref": "a"
     },
     "strictInstance": true,
     "instances": [
       {
-        "instance": null,
+        "instance": "",
         "errors": []
       },
       {
@@ -53,70 +50,7 @@
         "errors": [
           {
             "instancePath": "",
-            "schemaPath": "/definitions/b/type",
-            "schemaURI": ""
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "refs to other documents",
-    "registry": [
-      {
-        "id": "urn:example:foo",
-        "type": "null"
-      }
-    ],
-    "schema": {
-      "ref": "urn:example:foo"
-    },
-    "strictInstance": true,
-    "instances": [
-      {
-        "instance": null,
-        "errors": []
-      },
-      {
-        "instance": true,
-        "errors": [
-          {
-            "instancePath": "",
-            "schemaPath": "/type",
-            "schemaURI": "urn:example:foo"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "nested refs across documents",
-    "registry": [
-      {
-        "id": "urn:example:foo",
-        "type": "null"
-      },
-      {
-        "id": "urn:example:bar",
-        "ref": "urn:example:foo"
-      }
-    ],
-    "schema": {
-      "ref": "urn:example:bar"
-    },
-    "strictInstance": true,
-    "instances": [
-      {
-        "instance": null,
-        "errors": []
-      },
-      {
-        "instance": true,
-        "errors": [
-          {
-            "instancePath": "",
-            "schemaPath": "/type",
-            "schemaURI": "urn:example:foo"
+            "schemaPath": "/definitions/b/type"
           }
         ]
       }
@@ -124,11 +58,15 @@
   },
   {
     "name": "recursive schema",
-    "registry": [],
     "schema": {
-      "elements": {
-        "ref": "#"
-      }
+      "definitions": {
+        "root": {
+          "elements": {
+            "ref": "root"
+          }
+        }
+      },
+      "ref": "root"
     },
     "strictInstance": true,
     "instances": [
@@ -141,8 +79,7 @@
         "errors": [
           {
             "instancePath": "/1",
-            "schemaPath": "/elements",
-            "schemaURI": ""
+            "schemaPath": "/definitions/root/elements"
           }
         ]
       },
@@ -151,135 +88,7 @@
         "errors": [
           {
             "instancePath": "/2/0/1/0",
-            "schemaPath": "/elements",
-            "schemaURI": ""
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "mutually recursive schemas",
-    "registry": [
-      {
-        "id": "urn:example:foo",
-        "elements": {
-          "ref": "urn:example:bar"
-        }
-      },
-      {
-        "id": "urn:example:bar",
-        "ref": "urn:example:foo"
-      }
-    ],
-    "schema": {
-      "ref": "urn:example:bar"
-    },
-    "strictInstance": true,
-    "instances": [
-      {
-        "instance": [],
-        "errors": []
-      },
-      {
-        "instance": [[], "a"],
-        "errors": [
-          {
-            "instancePath": "/1",
-            "schemaPath": "/elements",
-            "schemaURI": "urn:example:foo"
-          }
-        ]
-      },
-      {
-        "instance": [[], [[]], [[[], ["a"]]]],
-        "errors": [
-          {
-            "instancePath": "/2/0/1/0",
-            "schemaPath": "/elements",
-            "schemaURI": "urn:example:foo"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "changing base URI",
-    "registry": [
-      {
-        "id": "http://example.com/foo",
-        "ref": "#a",
-        "definitions": {
-          "a": {
-            "type": "null"
-          }
-        }
-      }
-    ],
-    "schema": {
-      "ref": "http://example.com/foo",
-      "definitions": {
-        "a": {
-          "type": "string"
-        }
-      }
-    },
-    "strictInstance": true,
-    "instances": [
-      {
-        "instance": null,
-        "errors": []
-      },
-      {
-        "instance": "foo",
-        "errors": [
-          {
-            "instancePath": "",
-            "schemaPath": "/definitions/a/type",
-            "schemaURI": "http://example.com/foo"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "relative URL handling",
-    "registry": [
-      {
-        "id": "http://example.com/foo/",
-        "ref": "#a",
-        "definitions": {
-          "a": {
-            "type": "null"
-          }
-        }
-      },
-      {
-        "id": "http://example.com/foo/bar/baz",
-        "ref": "../#a"
-      }
-    ],
-    "schema": {
-      "ref": "http://example.com/foo/bar/baz",
-      "definitions": {
-        "a": {
-          "type": "string"
-        }
-      }
-    },
-    "strictInstance": true,
-    "instances": [
-      {
-        "instance": null,
-        "errors": []
-      },
-      {
-        "instance": "foo",
-        "errors": [
-          {
-            "instancePath": "",
-            "schemaPath": "/definitions/a/type",
-            "schemaURI": "http://example.com/foo/"
+            "schemaPath": "/definitions/root/elements"
           }
         ]
       }
