@@ -1,6 +1,6 @@
 ---
 title: JSON Schema Language
-docname: draft-json-schema-language-01
+docname: draft-json-schema-language-02
 date: 2019-06-06
 ipr: trust200902
 area: Applications
@@ -26,6 +26,8 @@ normative:
   RFC6901:
   RFC8259:
   RFC8174:
+informative:
+  RFC7493:
 
 --- abstract
 
@@ -202,7 +204,9 @@ type. The precise meaning of each of the primitive types is described in
 {{semantics}}.
 
 ~~~ cddl
-type = { type: "boolean" / "number" / "string" / "timestamp" }
+type = { type: "boolean" / num_type / "string" / "timestamp" }
+num_type = "number" / "float32" / "float64" /
+  "int8" / "uint8" / "int16" / "uint16" / "int32" / "uint32"
 ~~~
 
 For example, this schema constrains instances to be strings that are correct
@@ -503,14 +507,63 @@ The type form is meant to describe instances whose value is a boolean, number,
 string, or timestamp ({{RFC3339}}).
 
 If a schema is of the type form, then let *T* be the value of the member with
-the name `type`:
+the name `type`. The following table describes whether the instance is accepted,
+as a function of *T*'s value:
 
-- If *T* equals `boolean`, then the instance is accepted if it equals `true` or
-  `false`.
-- If *T* equals `number`, then the instance is accepted if it is a JSON number.
-- If *T* equals `string`, then the instance is accepted if it is a JSON string.
-- If *T* equals `timestamp`, then the instance is accepted if it is a JSON
-  string encoding a timestamp, as defined by {{RFC3339}}.
+|---------------------+----------------------------------------------|
+| If \_T\_ equals ...  | then the instance is accepted if it is ...  |
+|---------------------+----------------------------------------------|
+| boolean   | equal to `true` or `false`                             |
+| number    | a JSON number                                          |
+| float32   | a JSON number                                          |
+| float64   | a JSON number                                          |
+| int8      | See {{int-ranges}}                                     |
+| uint8     | See {{int-ranges}}                                     |
+| int16     | See {{int-ranges}}                                     |
+| uint16    | See {{int-ranges}}                                     |
+| int32     | See {{int-ranges}}                                     |
+| uint32    | See {{int-ranges}}                                     |
+| int64     | See {{int-ranges}}                                     |
+| uint64    | See {{int-ranges}}                                     |
+| string    | a JSON string                                          |
+| timestamp | a JSON string encoding a {{RFC3339}} timestamp         |
+|---------------------+----------------------------------------------|
+{: #type-values title="Accepted Values for Type"}
+
+`float32` and `float64` are distinguished from `number` in their intent.
+`float32` indicates data processed as an IEEE 754 single-precision float,
+whereas `float64` indicates data processed as an IEEE 754 double-precision
+float. Tools which generate code from JSL schemas will likely produce different
+code for `float32` than for `float64`.
+
+If _T_ starts with `int` or `uint`, then the instance is accepted if and only if
+it is a JSON number encoding a value with zero fractional part. Depending on the
+value of _T_, this encoded number must fall within a particular range:
+
+|--------+----------------------------+----------------------------|
+| \_T\_  | Minimum Value (Inclusive)  | Maximum Value (Inclusive)  |
+|--------+----------------------------+----------------------------|
+| int8   | -128                       | 127                        |
+| uint8  | 0                          | 255                        |
+| int16  | -32,768                    | 32,767                     |
+| uint16 | 0                          | 65,535                     |
+| int32  | -2,147,483,648             | 2,147,483,647              |
+| uint32 | 0                          | 4,294,967,295              |
+| int64  | -9,223,372,036,854,775,808 | 9,223,372,036,854,775,807  |
+| uint64 | 0                          | 18,446,744,073,709,551,615 |
+|--------+----------------------------+----------------------------|
+{: #int-ranges title="Ranges for Integer Types"}
+
+Note that both 10 and 10.0 encode values with zero fractional part. 10.5 encodes
+a number with a non-zero fractional part. Therefore {"type": "int8"} accepts 10
+and 10.0, but not 10.5.
+
+As an interoperability consideration, applications using the I-JSON profile of
+JSON ({{RFC7493}}) cannot presume numerical precision beyond that of IEEE 754
+double-precision floats. Therefore, these applications cannot represent the full
+range of `int64` or `uint64` without assuming possible loss of precision. For
+these applications, some instances may be erroneously accepted or rejected due
+to loss of precision.
 
 If the instance is not accepted, then the standard error for this case shall
 have an `instancePath` pointing to the instance, and a `schemaPath` pointing to
@@ -518,12 +571,13 @@ the schema member with the name `type`.
 
 For example:
 
-- The schema {"type": "boolean"} accepts false, but rejects 123.
-- The schema {"type": "number"} accepts 123, but rejects false.
+- The schema {"type": "boolean"} accepts false, but rejects 127.
+- The schema {"type": "number"} accepts 127 and 128, but rejects false.
+- The schema {"type": "uint8"} accepts 127, but rejects 128 and false.
 - The schema {"type": "string"} accepts "1985-04-12T23:20:50.52Z" and "foo", but
-  rejects 123.
+  rejects 127.
 - The schema {"type": "timestamp"} accepts "1985-04-12T23:20:50.52Z", but
-  rejects "foo" and 123.
+  rejects "foo" and 127.
 
 To give an example of standardized errors, the standard errors to produce when
 {"type": "boolean"} is evaluated against 123 is:
