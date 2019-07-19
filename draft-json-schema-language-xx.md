@@ -1,7 +1,7 @@
 ---
 title: JSON Schema Language
 docname: draft-json-schema-language-02
-date: 2019-06-06
+date: 2019-07-18
 ipr: trust200902
 area: Applications
 wg: JSON Working Group
@@ -26,6 +26,7 @@ normative:
   RFC6901:
   RFC8259:
   RFC8174:
+  RFC8610:
 informative:
   RFC7493:
 
@@ -65,7 +66,8 @@ easier to implement.
 
 It is expected that for many use-cases, a schema language of JSL's
 expressiveness is sufficient. Where a more expressive language is required,
-alternatives exist in CDDL and others.
+alternatives exist in CDDL ({{RFC8610}}, Concise Data Definition Language) and
+others.
 
 This document has the following structure:
 
@@ -95,6 +97,10 @@ being validated against a JSL schema.
 # Syntax {#syntax}
 
 This section describes when a JSON document is a correct JSL schema.
+
+JSL schemas may recurisvely contain other schemas. In this document, a "root
+schema" is one which is not contained within another schema, i.e. it is "top
+level".
 
 A correct JSL schema MUST match the `schema` CDDL rule described in this
 section. A JSL schema is a JSON object taking on an appropriate form. It may
@@ -148,16 +154,19 @@ something in `definitions`:
 ref = { ref: tstr }
 ~~~
 
-In a correct schema, the `ref` value must always refer to a definition at the
-root level of a schema. Note well: the *root* level of the schema. Definitions
-at the non-root level are immaterial. More formally:
+For a schema to be correct, the `ref` value must refer to one of the definitions
+found at the root level of the schema it appears in. More formally, for a schema
+of the `ref` form:
 
-Let *D* be the member of the root schema with the name `definitions`. For all
-schemas *S* of the ref form in the root schema, let *R* be the value of the
-member of *S* with the name `ref`. In a correct schema, *D* MUST exist and MUST
-have a member with a name equal to *R*.
+- Let *B* be the root schema containing the schema, or the schema itself if it
+  is a root schema.
+- Let *R* be the value of the member of *S* with the name `ref`.
 
-Here is an example of ref's use to avoid re-defining the same thing twice:
+If the schema is correct, then *B* must have a member *D* with the name
+`definitions`, and *D* must contain a member whose name equals *R*.
+
+Here is a correct example of `ref` being used to avoid re-defining the same
+thing twice:
 
 ~~~ json
 {
@@ -331,12 +340,16 @@ discriminator = { tag: tstr, mapping: * tstr => properties }
 ~~~
 
 To prevent ambiguous or unsatisfiable contstraints on the "tag" of a
-discriminator, an additional constraint on the discriminator form exists:
+discriminator, an additional constraint on schemas of the discriminator form
+exists. For schemas of the discriminator form:
 
-Let *T* be the value of the member with the name `tag`, and let *M* be the value
-of the member with the name `mapping`. Then for all values *S* of the members of
-*M*, *S* must not contain members named `properties` or `optionalProperties`
-whose values contain members with a name equal to *T*.
+- Let *D* be the schema member with the name `discriminator`.
+- Let *T* be the member of *D* with the name `tag`.
+- Let *M* be the member of *D* with the name `mapping`.
+
+If the schema is correct, then for all member values *S* of *M*, *S* must not
+have any member named `properties` or `optionalProperties` with a name equal to
+*T*'s value.
 
 Thus, this is an incorrect schema, as "event_type" is both the value of `tag`
 and a member name in one of the mapping member `properties`:
@@ -391,10 +404,10 @@ members in an instance. For example:
 { "properties": { "a": { "type": "string" }}}
 ~~~
 
-Some users may expect that `{"a": "foo", "b": "bar"}` satisfies the above
-schema. Others may disagree. JSL addresses this point of contention by leaving
-it to implementations whether to accept such "unspecified" members, or whether
-to reject them.
+Some users may expect that {"a": "foo", "b": "bar"} satisfies the above schema.
+Others may disagree. JSL addresses this point of contention by leaving it to
+implementations whether to accept such "unspecified" members, or whether to
+reject them.
 
 Rejecting "unspecified" members is called "strict instance semantics". Whether
 to use strict instance semantics is not specified within a schema -- it is
@@ -451,7 +464,8 @@ repetitive, and also enables describing recursive structures.
 
 If a schema is of the ref form, then:
 
-- Let *B* be the root schema containing the schema.
+- Let *B* be the root schema containing the schema, or the schema itself if it
+  is a root schema.
 - Let *D* be the member of *B* with the name `definitions`. By {{syntax}}, *D*
   exists.
 - Let *R* be the value of the schema member with the name `ref`.
@@ -531,14 +545,16 @@ as a function of *T*'s value:
 {: #type-values title="Accepted Values for Type"}
 
 `float32` and `float64` are distinguished from `number` in their intent.
-`float32` indicates data processed as an IEEE 754 single-precision float,
-whereas `float64` indicates data processed as an IEEE 754 double-precision
-float. Tools which generate code from JSL schemas will likely produce different
-code for `float32` than for `float64`.
+`float32` indicates data intended to be processed as an IEEE 754
+single-precision float, whereas `float64` indicates data intended to be
+processed as an IEEE 754 double-precision float. `number` indicates no specific
+intent. Tools which generate code from JSL schemas will likely produce different
+code for `float32`, `float64`, and `number`.
 
 If _T_ starts with `int` or `uint`, then the instance is accepted if and only if
 it is a JSON number encoding a value with zero fractional part. Depending on the
-value of _T_, this encoded number must fall within a particular range:
+value of _T_, this encoded number must additionally fall within a particular
+range:
 
 |--------+----------------------------+----------------------------|
 | \_T\_  | Minimum Value (Inclusive)  | Maximum Value (Inclusive)  |
@@ -572,15 +588,14 @@ the schema member with the name `type`.
 For example:
 
 - The schema {"type": "boolean"} accepts false, but rejects 127.
-- The schema {"type": "number"} accepts 127 and 128, but rejects false.
-- The schema {"type": "uint8"} accepts 127, but rejects 128 and false.
+- The schema {"type": "number"} accepts 10.5, 127 and 128, but rejects false.
+- The schema {"type": "int8"} accepts 127, but rejects 10.5, 128 and false.
 - The schema {"type": "string"} accepts "1985-04-12T23:20:50.52Z" and "foo", but
   rejects 127.
 - The schema {"type": "timestamp"} accepts "1985-04-12T23:20:50.52Z", but
   rejects "foo" and 127.
 
-To give an example of standardized errors, the standard errors to produce when
-{"type": "boolean"} is evaluated against 123 is:
+In all of the rejected examples just given, the standard error to produce is:
 
 ~~~ json
 [{ "instancePath": "", "schemaPath": "/type" }]
@@ -614,8 +629,8 @@ with the standard errors:
 
 ### Elements
 
-The elements form is meant to describe instances instances that must be arrays.
-A further sub-schema describes the elements of the array.
+The elements form is meant to describe instances that must be arrays. A further
+sub-schema describes the elements of the array.
 
 If a schema is of the elements form, then let *S* be the value of the schema
 member with the name `elements`. The instance is accepted if and only if all of
@@ -639,7 +654,7 @@ For example, if we have the schema:
 }
 ~~~
 
-Then the instances \[\] and \[1, 2, 3\] are accpeted. If instead we evaluate
+Then the instances \[\] and \[1, 2, 3\] are accepted. If instead we evaluate
 false against that schema, the standard errors are:
 
 ~~~ json
@@ -792,7 +807,7 @@ For example, if we have the schema:
 }
 ~~~
 
-Then the instances {} and {"a": 1, "b": 2} are accpeted. If instead we evaluate
+Then the instances {} and {"a": 1, "b": 2} are accepted. If instead we evaluate
 false against that schema, the standard errors are:
 
 ~~~ json
@@ -828,8 +843,8 @@ of the "discriminator" form, it validates:
 
 The behavior of the discriminator form is more complex than the other keywords.
 Readers familiar with CDDL may find the final example in
-{{comparison-with-cddl}} helpful in understanding its behavior. What follows
-here is an English description of the discriminator form's behavior, as well as
+{{comparison-with-cddl}} helpful in understanding its behavior. What follows in
+this section is a description of the discriminator form's behavior, as well as
 some examples.
 
 If a schema is of the "discriminator" form, then:
