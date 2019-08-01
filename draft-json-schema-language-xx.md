@@ -1,12 +1,11 @@
 ---
 title: JSON Schema Language
 docname: draft-json-schema-language-02
-date: 2019-07-18
+date: 2019-07-31
 ipr: trust200902
 area: Applications
-wg: JSON Working Group
 kw: Internet-Draft
-cat: std
+cat: info
 
 coding: us-ascii
 pi:
@@ -22,13 +21,10 @@ author:
 normative:
   RFC2119:
   RFC3339:
-  RFC3986:
   RFC6901:
   RFC8259:
   RFC8174:
   RFC8610:
-informative:
-  RFC7493:
 
 --- abstract
 
@@ -85,11 +81,11 @@ interpreted as described in {{RFC2119}} {{RFC8174}}.
 
 ## Terminology
 
-The terms "absolute-URI" and "URI-reference", when they appear in this document,
-are to be understood as they are defined in {{RFC3986}}.
-
 The term "JSON Pointer", when it appears in this document, is to be understood
 as it is defined in {{RFC6901}}.
+
+The terms "object", "member", "array", "number", "name", and "string" in this
+document are to be interpreted as described in {{RFC8259}}.
 
 The term "instance", when it appears in this document, refers to a JSON value
 being validated against a JSL schema.
@@ -98,7 +94,7 @@ being validated against a JSL schema.
 
 This section describes when a JSON document is a correct JSL schema.
 
-JSL schemas may recurisvely contain other schemas. In this document, a "root
+JSL schemas may recursively contain other schemas. In this document, a "root
 schema" is one which is not contained within another schema, i.e. it is "top
 level".
 
@@ -113,6 +109,7 @@ schema = {
   ? definitions: { * tstr => schema }
 }
 ~~~
+{: #cddl-schema title="CDDL Definition of a Schema"}
 
 This is not a correct JSL schema, as its `definitions` object contains a number,
 which is not a schema:
@@ -134,16 +131,18 @@ form = empty /
   values /
   discriminator
 ~~~
+{: #cddl-form title="CDDL Definition of the Schema Forms"}
 
 The first form, `empty`, is trivial. It is meant for matching any instance:
 
 ~~~ cddl
 empty = {}
 ~~~
+{: #cddl-empty title="CDDL Definition of the Empty Form"}
 
 Thus, this is a correct schema:
 
-~~~ cddl
+~~~ json
 {}
 ~~~
 
@@ -153,10 +152,11 @@ something in `definitions`:
 ~~~ cddl
 ref = { ref: tstr }
 ~~~
+{: #cddl-ref title="CDDL Definition of the Ref Form"}
 
 For a schema to be correct, the `ref` value must refer to one of the definitions
 found at the root level of the schema it appears in. More formally, for a schema
-of the `ref` form:
+*S* of the `ref` form:
 
 - Let *B* be the root schema containing the schema, or the schema itself if it
   is a root schema.
@@ -213,10 +213,11 @@ type. The precise meaning of each of the primitive types is described in
 {{semantics}}.
 
 ~~~ cddl
-type = { type: "boolean" / num_type / "string" / "timestamp" }
-num_type = "number" / "float32" / "float64" /
+type = { type: "boolean" / num-type / "string" / "timestamp" }
+num-type = "number" / "float32" / "float64" /
   "int8" / "uint8" / "int16" / "uint16" / "int32" / "uint32"
 ~~~
+{: #cddl-type title="CDDL Definition of the Type Form"}
 
 For example, this schema constrains instances to be strings that are correct
 {{RFC3339}} timestamps:
@@ -231,6 +232,7 @@ finite, predetermined set of values:
 ~~~ cddl
 enum = { enum: [+ tstr] }
 ~~~
+{: #cddl-enum title="CDDL Definition of the Enum Form"}
 
 The values within `[+ tstr]` MUST NOT contain duplicates. Thus, the following is
 a correct schema:
@@ -251,6 +253,7 @@ sub-schema describes the elements of the array.
 ~~~ cddl
 elements = { elements: schema }
 ~~~
+{: #cddl-elements title="CDDL Definition of the Elements Form"}
 
 Here is a schema describing an array of {{RFC3339}} timestamps:
 
@@ -277,6 +280,7 @@ with-optional-properties = {
   optionalProperties: * tstr => schema
 }
 ~~~
+{: #cddl-properties title="CDDL Definition of the Properties Form"}
 
 If a schema has both a member named `properties` (with value *P*) and another
 member named `optionalProperties` (with value *O*), then *O* and *P* MUST NOT
@@ -322,6 +326,7 @@ but places no constraints on the member names:
 ~~~ cddl
 values = { values: * tstr => schema }
 ~~~
+{: #cddl-values title="CDDL Definition of the Values Form"}
 
 Thus, this is a correct schema, describing a mapping from strings to numbers:
 
@@ -338,6 +343,7 @@ appropriate schema to use.
 ; Note well: the values of mapping are of the properties form.
 discriminator = { tag: tstr, mapping: * tstr => properties }
 ~~~
+{: #cddl-discriminator title="CDDL Definition of the Discriminator Form"}
 
 To prevent ambiguous or unsatisfiable contstraints on the "tag" of a
 discriminator, an additional constraint on schemas of the discriminator form
@@ -347,12 +353,13 @@ exists. For schemas of the discriminator form:
 - Let *T* be the member of *D* with the name `tag`.
 - Let *M* be the member of *D* with the name `mapping`.
 
-If the schema is correct, then for all member values *S* of *M*, *S* must not
-have any member named `properties` or `optionalProperties` with a name equal to
-*T*'s value.
+If the schema is correct, then all member values *S* of *M* will be schemas of
+the "properties" form. For each member *P* of *S* whose name equals `properties`
+or `optionalProperties`, *P*'s value, which must be an object, MUST NOT contain
+any members whose name equals *T*'s value.
 
 Thus, this is an incorrect schema, as "event_type" is both the value of `tag`
-and a member name in one of the mapping member `properties`:
+and a member name in one of the `mapping` member `properties`:
 
 ~~~ json
 {
@@ -453,8 +460,8 @@ The forms a correct schema may take on are formally described in {{syntax}}.
 The empty form is meant to describe instances whose values are unknown,
 unpredictable, or otherwise unconstrained by the schema.
 
-If a schema is of the empty form, then it accepts all instances. An empty schema
-will never produce any errors.
+If a schema is of the empty form, then it accepts all instances. A schema of the
+empty form will never produce any errors.
 
 ### Ref
 
@@ -537,8 +544,6 @@ as a function of *T*'s value:
 | uint16    | See {{int-ranges}}                                     |
 | int32     | See {{int-ranges}}                                     |
 | uint32    | See {{int-ranges}}                                     |
-| int64     | See {{int-ranges}}                                     |
-| uint64    | See {{int-ranges}}                                     |
 | string    | a JSON string                                          |
 | timestamp | a JSON string encoding a {{RFC3339}} timestamp         |
 |---------------------+----------------------------------------------|
@@ -565,21 +570,12 @@ range:
 | uint16 | 0                          | 65,535                     |
 | int32  | -2,147,483,648             | 2,147,483,647              |
 | uint32 | 0                          | 4,294,967,295              |
-| int64  | -9,223,372,036,854,775,808 | 9,223,372,036,854,775,807  |
-| uint64 | 0                          | 18,446,744,073,709,551,615 |
 |--------+----------------------------+----------------------------|
 {: #int-ranges title="Ranges for Integer Types"}
 
-Note that both 10 and 10.0 encode values with zero fractional part. 10.5 encodes
-a number with a non-zero fractional part. Therefore {"type": "int8"} accepts 10
-and 10.0, but not 10.5.
-
-As an interoperability consideration, applications using the I-JSON profile of
-JSON ({{RFC7493}}) cannot presume numerical precision beyond that of IEEE 754
-double-precision floats. Therefore, these applications cannot represent the full
-range of `int64` or `uint64` without assuming possible loss of precision. For
-these applications, some instances may be erroneously accepted or rejected due
-to loss of precision.
+Note that 10, 10.0, and 1.0e1 encode values with zero fractional part. 10.5
+encodes a number with a non-zero fractional part. Thus {"type": "int8"} accepts
+10, 10.0, and 1.0e1, but not 10.5.
 
 If the instance is not accepted, then the standard error for this case shall
 have an `instancePath` pointing to the instance, and a `schemaPath` pointing to
@@ -887,7 +883,8 @@ The instance is accepted if and only if:
   *S*'s value.
 
   Otherwise, the standard errors for this case shall be standard errors from
-  evaluating *S*'s value against the instance.
+  evaluating *S*'s value against the instance, with the "discriminator tag
+  exemption" applied to *I*.
 
 Each of the list items above are defined to be mutually exclusive. For the same
 instance and schema, only one of the list items above will apply.
@@ -1177,4 +1174,5 @@ Bowman, Gowry Sankar, Donald Pipowitch, Dave Finlay, Denis Laxalde, Henry
 Andrews, and Austin Wright for their work on the initial drafts of JSON Schema,
 which inspired JSON Schema Language.
 
-Thanks to Tim Bray and Carsten Bormann for their help on JSON Schema Language.
+Thanks to Tim Bray, Carsten Bormann, and James Manger for their help on JSON
+Schema Language.
