@@ -1,6 +1,6 @@
 ---
 title: JSON Schema Language
-docname: draft-ucarion-json-schema-language-03
+docname: draft-ucarion-json-schema-language-00
 date: 2019-08-05
 ipr: trust200902
 area: Applications
