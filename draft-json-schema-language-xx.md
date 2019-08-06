@@ -1,13 +1,12 @@
 ---
 title: JSON Schema Language
-docname: draft-json-schema-language-02
-date: 2019-07-31
+docname: draft-ucarion-json-schema-language-03
+date: 2019-08-05
 ipr: trust200902
 area: Applications
 kw: Internet-Draft
 cat: info
 
-coding: us-ascii
 pi:
   toc: yes
   sortrefs:
@@ -19,18 +18,16 @@ author:
     email: ulyssecarion@gmail.com
 
 normative:
-  RFC2119:
   RFC3339:
   RFC6901:
   RFC8259:
-  RFC8174:
   RFC8610:
 
 --- abstract
 
-JavaScript Object Notation (JSON) Schema Language is a portable method for
-describing the format of JSON ({{RFC8259}}, JavaScript Object Notation) data and
-the errors associated with ill-formed data.
+JSON Schema Language (JSL) is a portable method for describing the format of
+JavaScript Object Notation (JSON) data and the errors associated with ill-formed
+data. JSL is designed to enable code generation from schemas.
 
 --- middle
 
@@ -73,13 +70,9 @@ and what errors should be produced when the data is unsatisfactory.
 {{comparison-with-cddl}} presents various JSL schemas and their CDDL
 equivalents.
 
-## Requirements notation
-
-The keywords MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD, SHOULD NOT,
-RECOMMENDED, MAY, and OPTIONAL, when they appear in this document, are to be
-interpreted as described in {{RFC2119}} {{RFC8174}}.
-
 ## Terminology
+
+{::boilerplate bcp14+}
 
 The term "JSON Pointer", when it appears in this document, is to be understood
 as it is defined in {{RFC6901}}.
