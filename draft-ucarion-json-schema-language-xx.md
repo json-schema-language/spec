@@ -1,9 +1,10 @@
 ---
-title: JSON Schema Language
-docname: draft-ucarion-json-schema-language-00
-date: 2019-08-05
+title: JSON Schema Language (JSL)
+docname: draft-ucarion-json-schema-language-01
+date: 2019-08-09
 ipr: trust200902
 area: Applications
+wg: Independent Submission
 kw: Internet-Draft
 cat: info
 
@@ -99,8 +100,24 @@ data.
 ~~~ cddl
 schema = {
   form,
-  ? definitions: { * tstr => schema }
+  ? definitions: { * tstr => schema },
+  ? strict: bool,
+  * non-keyword => *
 }
+
+; This definition prohibits non-keyword from matching any of the
+; keywords defined later.
+non-keyword =
+  (((((((((tstr .ne "definitions")
+    .ne "strict")
+    .ne "ref")
+    .ne "type")
+    .ne "enum")
+    .ne "elements")
+    .ne "properties")
+    .ne "optionalProperties")
+    .ne "values")
+    .ne "discriminator"
 ~~~
 {: #cddl-schema title="CDDL Definition of a Schema"}
 
@@ -109,6 +126,26 @@ which is not a schema:
 
 ~~~ json
 { "definitions": { "foo": 3 }}
+~~~
+
+Here is an example of a valid schema using the `properties`, `type`, and `ref`
+forms, which will be described later in this section:
+
+~~~ json
+{
+  "strict": false,
+  "definitions": {
+    "user": {
+      "properties": {
+        "name": { "type": "string" },
+        "create_time": { "type": "timestamp" }
+      }
+    }
+  },
+  "elements": {
+    "ref": "user"
+  }
+}
 ~~~
 
 JSL schemas can take on one of eight forms. These forms are defined so as to be
@@ -390,6 +427,22 @@ JSON-based messaging systems:
 }
 ~~~
 
+This document does not describe any extension mechanisms for JSL schema
+validation. However, schemas (through the `non-keyword` CDDL rule in this
+section) are defined to allow members whose names are not equal to any of the
+specially-defined keywords (i.e. `definitions`, `elements`, etc.) described in
+this section. Call these members "non-keyword members".
+
+Users MAY add additional, non-keyword members to JSL schemas to convey
+information that is not pertinent to validation. For example, such non-keyword
+members could provide hints to code generators, or trigger some special behavior
+for a library that generates user interfaces from schemas.
+
+Users SHOULD NOT expect non-keyword members to be understood by other parties.
+As a result, if consistent validation with other parties is a requirement, users
+SHOULD NOT use non-keyword members to affect how schema validation, as described
+in {{semantics}}, works.
+
 # Semantics {#semantics}
 
 This section describes when an instance is valid against a correct JSL schema,
@@ -405,20 +458,41 @@ members in an instance. For example:
 ~~~
 
 Some users may expect that {"a": "foo", "b": "bar"} satisfies the above schema.
-Others may disagree. JSL addresses this point of contention by leaving it to
-implementations whether to accept such "unspecified" members, or whether to
-reject them.
+Others may disagree, as `b` is not one of the properties described in the
+schema. In this document, rejecting such "unspecified" members is called "strict
+instance semantics".
 
-Rejecting "unspecified" members is called "strict instance semantics". Whether
-to use strict instance semantics is not specified within a schema -- it is
-considered out-of-band information.
+Validation of a schema *S* uses strict instance semantics if:
 
-Implementations MAY allow users to choose whether to use strict instance
-semantics. Implementations SHOULD document whether they use strict instance
-semantics by default.
+- Let *R* be the root schema containing *S*, or *S* itself if it is a root
+  schema.
+- Let *M* be the member of *R* whose name equals `strict`.
+
+Validation of a schema *S* uses strict instance semantics if *M* does not exist,
+or if *M*'s value is the JSON boolean `false`.
+
+By this definition, strict instance semantics is the "default" behavior.
+Furthermore, as only the `strict` member at the root level determines this
+strict behavior, it is not possible for a schema to "mix and match" strict and
+non-strict behavior.
 
 See {{semantics-form-props}} for how strict instance semantics affects schema
-evaluation.
+evaluation, but briefly, the following schema:
+
+~~~ json
+{ "properties": { "a": { "type": "string" }}}
+~~~
+
+Rejects {"a": "foo", "b": "bar"}, but the schema:
+
+~~~ json
+{
+  "strict": false,
+  "properties": { "a": { "type": "string" }}
+}
+~~~
+
+Accepts {"a": "foo", "b": "bar"}.
 
 ## Errors
 
